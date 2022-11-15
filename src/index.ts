@@ -1,4 +1,5 @@
 import express from 'express'
+import bodyParser from 'body-parser'
 import moment from 'moment'
 import { isEmpty, trim } from 'lodash'
 import { getNextId, getErrors } from './utils'
@@ -6,9 +7,9 @@ import { HTTPStatuses } from './types'
 import { db } from './mocks'
 
 export const app = express()
-const port = 3000
+const port = process.env.PORT || 5000
 
-const jsonBodyMiddleware = express.json()
+const jsonBodyMiddleware = bodyParser.json()
 app.use(jsonBodyMiddleware)
 
 app
