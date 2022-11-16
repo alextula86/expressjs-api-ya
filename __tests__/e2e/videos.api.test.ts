@@ -199,7 +199,7 @@ describe('/api/videos',  () => {
   })
 
   it('should update with correct input data', async () => {
-    const publicationDate = moment().format()
+    const publicationDate = new Date().toISOString()
       await request(app)
       .put(`/api/videos/${createdVideo1.id}`)
       .send({
@@ -221,6 +221,7 @@ describe('/api/videos',  () => {
         availableResolutions: [AvailableResolutions.P144, AvailableResolutions.P1440],
         canBeDownloaded: true,
         minAgeRestriction: 10,
+        publicationDate: publicationDate,
       })
 
       await request(app)

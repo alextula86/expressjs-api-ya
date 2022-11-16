@@ -31,11 +31,11 @@ export const errorsValidator = {
 export const getErrors = (reqBody: any) => {
     const errorsMessages: ErrorsMessagesType[] = []
 
-    if (isEmpty(trim(String(reqBody.title))) || trim(String(reqBody.title)).length > 40) {
+    if (!reqBody.title || isEmpty(trim(String(reqBody.title))) || trim(String(reqBody.title)).length > 40) {
       errorsMessages.push(errorsValidator.titleError)
     }
 
-    if (isEmpty(trim(String(reqBody.author))) || trim(String(reqBody.author)).length > 20) {
+    if (!reqBody.author || isEmpty(trim(String(reqBody.author))) || trim(String(reqBody.author)).length > 20) {
       errorsMessages.push(errorsValidator.authorError)
     }
 
@@ -50,8 +50,6 @@ export const getErrors = (reqBody: any) => {
     if (isNumber(reqBody.minAgeRestriction) && (reqBody.minAgeRestriction < 1 || reqBody.minAgeRestriction > 18)) {
       errorsMessages.push(errorsValidator.minAgeRestrictionError)
     }
-
-
 
     return errorsMessages
   }
