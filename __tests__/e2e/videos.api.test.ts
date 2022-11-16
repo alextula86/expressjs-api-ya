@@ -29,11 +29,13 @@ describe('/api/videos',  () => {
         author: '',
         availableResolutions: [],
       })
-      .expect(HTTPStatuses.BADREQUEST400, [
-        errorsValidator.titleError,
-        errorsValidator.authorError,
-        errorsValidator.availableResolutionsError,
-      ])
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.titleError,
+          errorsValidator.authorError,
+          errorsValidator.availableResolutionsError,
+        ]
+      })
 
       await request(app)
       .post('/api/videos')
@@ -42,10 +44,12 @@ describe('/api/videos',  () => {
         author: '',
         availableResolutions: null,
       })
-      .expect(HTTPStatuses.BADREQUEST400, [
-        errorsValidator.titleError,
-        errorsValidator.authorError,
-      ])
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.titleError,
+          errorsValidator.authorError,
+        ]
+      })
 
       await request(app)
       .post('/api/videos')
@@ -54,10 +58,12 @@ describe('/api/videos',  () => {
         author: 'author будет больше 20 символов'.repeat(2),
         availableResolutions: null,
       })
-      .expect(HTTPStatuses.BADREQUEST400, [
-        errorsValidator.titleError,
-        errorsValidator.authorError,
-      ])      
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.titleError,
+          errorsValidator.authorError,
+        ]
+      })      
 
       await request(app)
       .get('/api/videos/1')
@@ -144,11 +150,13 @@ describe('/api/videos',  () => {
         minAgeRestriction: 1,
         publicationDate: publicationDate,
       })
-      .expect(HTTPStatuses.BADREQUEST400, [
-        errorsValidator.titleError,
-        errorsValidator.authorError,
-        errorsValidator.availableResolutionsError,
-      ])
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.titleError,
+          errorsValidator.authorError,
+          errorsValidator.availableResolutionsError,
+        ]
+      })
 
       await request(app)
       .put(`/api/videos/${createdVideo1.id}`)
@@ -160,10 +168,12 @@ describe('/api/videos',  () => {
         minAgeRestriction: 0,
         publicationDate: publicationDate,
       })
-      .expect(HTTPStatuses.BADREQUEST400, [
-        errorsValidator.titleError,
-        errorsValidator.minAgeRestrictionError,
-      ])
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.titleError,
+          errorsValidator.minAgeRestrictionError,
+        ] 
+      })
 
       await request(app)
       .put(`/api/videos/${createdVideo1.id}`)
@@ -175,11 +185,13 @@ describe('/api/videos',  () => {
         minAgeRestriction: 20,
         publicationDate: publicationDate,
       })
-      .expect(HTTPStatuses.BADREQUEST400, [
-        errorsValidator.authorError,
-        errorsValidator.canBeDownloadedError,
-        errorsValidator.minAgeRestrictionError,
-      ])
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.authorError,
+          errorsValidator.canBeDownloadedError,
+          errorsValidator.minAgeRestrictionError,
+        ]
+      })
 
       await request(app)
       .put('/api/videos/' + -100)

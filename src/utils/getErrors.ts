@@ -1,4 +1,4 @@
-import { isEmpty, trim, isArray, isNumber, isBoolean, isUndefined } from 'lodash'
+import { isEmpty, trim, isArray, isNumber, isBoolean, isUndefined, isNull } from 'lodash'
 import { ErrorsMessagesType } from '../types'
 
 export const errorsValidator = {
@@ -31,11 +31,11 @@ export const errorsValidator = {
 export const getErrors = (reqBody: any) => {
     const errorsMessages: ErrorsMessagesType[] = []
 
-    if (!reqBody.title || isEmpty(trim(String(reqBody.title))) || trim(String(reqBody.title)).length > 40) {
+    if (isNull(reqBody.title) || isEmpty(trim(String(reqBody.title))) || trim(String(reqBody.title)).length > 40) {
       errorsMessages.push(errorsValidator.titleError)
     }
 
-    if (!reqBody.author || isEmpty(trim(String(reqBody.author))) || trim(String(reqBody.author)).length > 20) {
+    if (isNull(reqBody.author) || isEmpty(trim(String(reqBody.author))) || trim(String(reqBody.author)).length > 20) {
       errorsMessages.push(errorsValidator.authorError)
     }
 
@@ -51,5 +51,5 @@ export const getErrors = (reqBody: any) => {
       errorsMessages.push(errorsValidator.minAgeRestrictionError)
     }
 
-    return errorsMessages
+    return { errorsMessages: errorsMessages }
   }

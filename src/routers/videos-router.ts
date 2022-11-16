@@ -16,7 +16,7 @@ videosRouter
   .post('/', (req, res) => {
     const errors = getErrors(req.body)
 
-    if (!isEmpty(errors)) {
+    if (!isEmpty(errors.errorsMessages)) {
       res.status(HTTPStatuses.BADREQUEST400).send(errors)
       return
     }
@@ -50,7 +50,7 @@ videosRouter
   .put('/:id', (req, res) => {
     const errors = getErrors(req.body)
 
-    if (!isEmpty(errors)) {
+    if (!isEmpty(errors.errorsMessages)) {
       res.status(HTTPStatuses.BADREQUEST400).send(errors)
       return
     }
