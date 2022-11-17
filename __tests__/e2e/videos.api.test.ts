@@ -206,6 +206,22 @@ describe('/api/videos',  () => {
       })
 
       await request(app)
+      .put(`/api/videos/${createdVideo1.id}`)
+      .send({
+        title: 'Видео 1',
+        author: 'Автор 1',
+        availableResolutions: [AvailableResolutions.P144],
+        canBeDownloaded: true,
+        minAgeRestriction: 10,
+        publicationDate: 1995,
+      })
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.publicationDateError,
+        ]
+      })
+
+      await request(app)
       .put('/api/videos/' + -100)
       .send({
         title: 'Видео 1 обновлен',

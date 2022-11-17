@@ -1,4 +1,4 @@
-import { isEmpty, trim, isArray, isNumber, isBoolean, isUndefined, isNull } from 'lodash'
+import { isEmpty, trim, isArray, isNumber, isBoolean, isUndefined, isNull, isString } from 'lodash'
 import { ErrorsMessagesType, AvailableResolutions } from '../types'
 
 export const errorsValidator = {
@@ -25,6 +25,11 @@ export const errorsValidator = {
   minAgeRestrictionError: {
     message: "minAgeRestriction is incorrectly",
     field: "minAgeRestriction"
+  },
+  
+  publicationDateError: {
+    message: "publicationDate is incorrectly",
+    field: "publicationDate"
   }, 
 }
 
@@ -51,6 +56,10 @@ export const getErrors = (reqBody: any) => {
 
     if (isNumber(reqBody.minAgeRestriction) && (reqBody.minAgeRestriction < 1 || reqBody.minAgeRestriction > 18)) {
       errorsMessages.push(errorsValidator.minAgeRestrictionError)
+    }
+
+    if (reqBody.publicationDate && !isString(reqBody.publicationDate)) {
+      errorsMessages.push(errorsValidator.publicationDateError)
     }
 
     return { errorsMessages: errorsMessages }
