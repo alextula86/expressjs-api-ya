@@ -1,5 +1,4 @@
 import request from 'supertest'
-import moment from 'moment'
 import { app } from '../../src'
 import { VideoType, AvailableResolutions, HTTPStatuses } from '../../src/types'
 import { errorsValidator } from '../../src/utils'
@@ -37,7 +36,7 @@ describe('/api/videos',  () => {
         ]
       })
 
-      await request(app)
+    await request(app)
       .post('/api/videos')
       .send({
         title: 'title будет больше 40 символов'.repeat(3),
@@ -51,7 +50,7 @@ describe('/api/videos',  () => {
         ]
       })
 
-      await request(app)
+   await request(app)
       .post('/api/videos')
       .send({
         title: '',
@@ -63,8 +62,21 @@ describe('/api/videos',  () => {
           errorsValidator.titleError,
           errorsValidator.authorError,
         ]
-      })      
-
+      })
+      
+      await request(app)
+      .post('/api/videos')
+      .send({
+        title: 'Valid title',
+        author: 'valid author',
+        availableResolutions: [AvailableResolutions.P144, 'none', AvailableResolutions.P1080],
+      })
+      .expect(HTTPStatuses.BADREQUEST400, {
+        errorsMessages: [
+          errorsValidator.availableResolutionsError,
+        ]
+      })   
+      
       await request(app)
       .get('/api/videos/1')
       .expect(HTTPStatuses.NOTFOUND404)
@@ -138,7 +150,7 @@ describe('/api/videos',  () => {
   })
 
   it('should not update with incorrect input data', async () => {
-    const publicationDate = moment().format()
+    const publicationDate = new Date().toISOString()
       
       await request(app)
       .put(`/api/videos/${createdVideo1.id}`)
