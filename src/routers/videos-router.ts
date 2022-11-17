@@ -20,11 +20,11 @@ videosRouter
       res.status(HTTPStatuses.BADREQUEST400).send(errors)
       return
     }
-    
+
     const date = new Date()
     date.setDate(date.getDate() + 1)
     const dateISO = date.toISOString()
-
+    
     const item = {
       id: getNextId(),
       title: trim(String(req.body.title)),
