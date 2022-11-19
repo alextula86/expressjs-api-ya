@@ -1,19 +1,51 @@
-import { Router } from "express";
+import { Router, Response } from "express";
 import { isEmpty, trim } from 'lodash'
 import { getNextId, getErrors } from '../utils'
-import { HTTPStatuses } from '../types'
+import {
+  HTTPStatuses,
+  VideoType,
+  VideoViewModel,
+  URIParamsVideoModel,
+  CreateVideoModel,
+  UpdateVideoModel,
+  RequestWithBody,
+  RequestWithParams,
+  RequestWithParamsAndBody,
+  ErrorsMessageType,
+} from '../types'
 import { db } from '../mocks'
 
 export const videosRouter = Router()
 
+const getViewModel = (dbVideo: VideoType): VideoViewModel => ({
+  id: dbVideo.id,
+  title: dbVideo.title,
+  author: dbVideo.author,
+  availableResolutions: dbVideo.availableResolutions,
+  canBeDownloaded: dbVideo.canBeDownloaded,
+  minAgeRestriction: dbVideo.minAgeRestriction,
+  createdAt: dbVideo.createdAt,
+  publicationDate: dbVideo.publicationDate,
+})
+
 videosRouter
-  .get('/', (_, res) => {
-    res.status(HTTPStatuses.SUCCESS200).send(db.videos)
+  .get('/', (_, res: Response<VideoViewModel[]>) => {
+    const result: VideoViewModel[] = db.videos.map(getViewModel)
+    res.status(HTTPStatuses.SUCCESS200).send(result)
   })
-  .get('/', (_, res) => {
-    res.status(HTTPStatuses.SUCCESS200).send(db.videos)
+  .get('/:id', (req: RequestWithParams<URIParamsVideoModel>, res: Response<VideoViewModel>) => {
+    const video = db.videos.find((item) => item.id === +req.params.id)
+
+    if (!video) {
+      res.status(HTTPStatuses.NOTFOUND404).send()
+      return
+    }
+
+    const result = getViewModel(video)
+
+    res.status(HTTPStatuses.SUCCESS200).send(result)
   })
-  .post('/', (req, res) => {
+  .post('/', (req: RequestWithBody<CreateVideoModel>, res: Response<VideoViewModel | ErrorsMessageType>) => {
     const errors = getErrors(req.body)
 
     if (!isEmpty(errors.errorsMessages)) {
@@ -26,31 +58,23 @@ videosRouter
     publicationDate.setDate(publicationDate.getDate() + 1)
     const publicationDateISO = publicationDate.toISOString()
     
-    const item = {
+    const createdVideo: VideoType = {
       id: getNextId(),
       title: trim(String(req.body.title)),
       author: trim(String(req.body.author)),
       availableResolutions: !isEmpty(req.body.availableResolutions) ? req.body.availableResolutions : null,
-      canBeDownloaded: req.body.canBeDownloaded || false,
-      minAgeRestriction: req.body.minAgeRestriction || null,
+      canBeDownloaded: false,
+      minAgeRestriction: null,
       createdAt: createdAtISO,
       publicationDate: publicationDateISO,
     }
 
-    db.videos.push(item)
-    res.status(HTTPStatuses.CREATED201).send(item)
+    db.videos.push(createdVideo)
+    const result = getViewModel(createdVideo)
+    res.status(HTTPStatuses.CREATED201).send(result)
   })
-  .get('/:id', (req, res) => {
-    const video = db.videos.find(({ id }) => id === Number(req.params.id))
 
-    if (!video) {
-      res.status(HTTPStatuses.NOTFOUND404).send()
-      return
-    }
-
-    res.status(HTTPStatuses.SUCCESS200).send(video)
-  })
-  .put('/:id', (req, res) => {
+  .put('/:id', (req: RequestWithParamsAndBody<URIParamsVideoModel, UpdateVideoModel>, res: Response) => {
     const errors = getErrors(req.body)
 
     if (!isEmpty(errors.errorsMessages)) {
@@ -58,13 +82,17 @@ videosRouter
       return
     }
 
-    const id = +req.params.id    
-    const video = db.videos.find((video) => video.id === id)
+    const id = +req.params.id
+    const video = db.videos.find((item) => item.id === id)
 
     if (!video) {
       res.status(HTTPStatuses.NOTFOUND404).send()
       return
     }   
+
+    const publicationDate = new Date()
+    publicationDate.setDate(publicationDate.getDate() + 1)
+    const publicationDateISO = publicationDate.toISOString()
 
     video.id = id,
     video.title = trim(String(req.body.title)),
@@ -73,11 +101,11 @@ videosRouter
     video.canBeDownloaded = req.body.canBeDownloaded || false,
     video.minAgeRestriction = req.body.minAgeRestriction || null,
     video.createdAt = video.createdAt,
-    video.publicationDate = req.body.publicationDate,
+    video.publicationDate = req.body.publicationDate || publicationDateISO,
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .delete('/:id', (req, res) => {
+  .delete('/:id', (req: RequestWithParams<URIParamsVideoModel>, res: Response) => {
     const video = db.videos.find(({ id }) => id === +req.params.id)
 
     if (!video) {

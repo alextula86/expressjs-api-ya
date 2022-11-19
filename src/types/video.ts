@@ -13,14 +13,16 @@ export enum AvailableResolutions {
     id: number
     title: string
     author: string
+    availableResolutions: AvailableResolutions[] | null
     canBeDownloaded: boolean
     minAgeRestriction: number | null
     createdAt: string
     publicationDate: string
-    availableResolutions: AvailableResolutions[]
   }
 
   export type ErrorsMessagesType = {
     message: string,
     field: string
   }
+
+  export type ErrorsMessageType = { errorsMessages: ErrorsMessagesType[] }

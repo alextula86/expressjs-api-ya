@@ -1,5 +1,5 @@
 import { isEmpty, trim, isArray, isNumber, isBoolean, isUndefined, isNull, isString } from 'lodash'
-import { ErrorsMessagesType, AvailableResolutions } from '../types'
+import { ErrorsMessagesType, ErrorsMessageType, AvailableResolutions } from '../types'
 
 export const errorsValidator = {
   titleError: {
@@ -33,7 +33,7 @@ export const errorsValidator = {
   }, 
 }
 
-export const getErrors = (reqBody: any) => {
+export const getErrors = (reqBody: any): ErrorsMessageType => {
     const errorsMessages: ErrorsMessagesType[] = []
 
     if (isNull(reqBody.title) || isEmpty(trim(String(reqBody.title))) || trim(String(reqBody.title)).length > 40) {
