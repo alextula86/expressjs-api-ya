@@ -1,9 +1,9 @@
 import { Router, Response } from "express";
-import { isEmpty, trim } from 'lodash'
-import { getNextId, getErrors } from '../utils'
+import { isEmpty } from 'lodash'
+import { videoRepository } from '../repositories'
+import { getVideoViewModel, getErrors } from '../utils'
 import {
   HTTPStatuses,
-  VideoType,
   VideoViewModel,
   URIParamsVideoModel,
   CreateVideoModel,
@@ -13,37 +13,25 @@ import {
   RequestWithParamsAndBody,
   ErrorsMessageType,
 } from '../types'
-import { db } from '../mocks'
 
 export const videosRouter = Router()
 
-const getViewModel = (dbVideo: VideoType): VideoViewModel => ({
-  id: dbVideo.id,
-  title: dbVideo.title,
-  author: dbVideo.author,
-  availableResolutions: dbVideo.availableResolutions,
-  canBeDownloaded: dbVideo.canBeDownloaded,
-  minAgeRestriction: dbVideo.minAgeRestriction,
-  createdAt: dbVideo.createdAt,
-  publicationDate: dbVideo.publicationDate,
-})
-
 videosRouter
   .get('/', (_, res: Response<VideoViewModel[]>) => {
-    const result: VideoViewModel[] = db.videos.map(getViewModel)
-    res.status(HTTPStatuses.SUCCESS200).send(result)
+    const allVideos = videoRepository.findAllVideos()
+    const allVideosResponse = allVideos.map(getVideoViewModel)
+    res.status(HTTPStatuses.SUCCESS200).send(allVideosResponse)
   })
   .get('/:id', (req: RequestWithParams<URIParamsVideoModel>, res: Response<VideoViewModel>) => {
-    const video = db.videos.find((item) => item.id === +req.params.id)
+    const videoById = videoRepository.findVideoById(+req.params.id)
 
-    if (!video) {
+    if (!videoById) {
       res.status(HTTPStatuses.NOTFOUND404).send()
       return
     }
 
-    const result = getViewModel(video)
-
-    res.status(HTTPStatuses.SUCCESS200).send(result)
+    const videoByIdResponse = getVideoViewModel(videoById)
+    res.status(HTTPStatuses.SUCCESS200).send(videoByIdResponse)
   })
   .post('/', (req: RequestWithBody<CreateVideoModel>, res: Response<VideoViewModel | ErrorsMessageType>) => {
     const errors = getErrors(req.body)
@@ -53,27 +41,15 @@ videosRouter
       return
     }
 
-    const createdAtISO = new Date().toISOString()
-    const publicationDate = new Date()
-    publicationDate.setDate(publicationDate.getDate() + 1)
-    const publicationDateISO = publicationDate.toISOString()
-    
-    const createdVideo: VideoType = {
-      id: getNextId(),
-      title: trim(String(req.body.title)),
-      author: trim(String(req.body.author)),
-      availableResolutions: !isEmpty(req.body.availableResolutions) ? req.body.availableResolutions : null,
-      canBeDownloaded: false,
-      minAgeRestriction: null,
-      createdAt: createdAtISO,
-      publicationDate: publicationDateISO,
-    }
+    const createdVideo = videoRepository.createdProduct({
+      title: req.body.title,
+      author: req.body.author,
+      availableResolutions: req.body.availableResolutions,
+    })
 
-    db.videos.push(createdVideo)
-    const result = getViewModel(createdVideo)
-    res.status(HTTPStatuses.CREATED201).send(result)
+    const createdVideoResponse = getVideoViewModel(createdVideo)
+    res.status(HTTPStatuses.CREATED201).send(createdVideoResponse)
   })
-
   .put('/:id', (req: RequestWithParamsAndBody<URIParamsVideoModel, UpdateVideoModel>, res: Response) => {
     const errors = getErrors(req.body)
 
@@ -82,37 +58,29 @@ videosRouter
       return
     }
 
-    const id = +req.params.id
-    const video = db.videos.find((item) => item.id === id)
+    const isVideoUpdated = videoRepository.updateVideo(+req.params.id, {
+      title: req.body.title,
+      author: req.body.author,
+      availableResolutions: req.body.availableResolutions,
+      canBeDownloaded: req.body.canBeDownloaded,
+      minAgeRestriction: req.body.minAgeRestriction,
+      publicationDate: req.body.publicationDate,
+    })
 
-    if (!video) {
+    if (!isVideoUpdated) {
       res.status(HTTPStatuses.NOTFOUND404).send()
       return
-    }   
-
-    const publicationDate = new Date()
-    publicationDate.setDate(publicationDate.getDate() + 1)
-    const publicationDateISO = publicationDate.toISOString()
-
-    video.id = id,
-    video.title = trim(String(req.body.title)),
-    video.author = trim(String(req.body.author)),
-    video.availableResolutions = !isEmpty(req.body.availableResolutions) ? req.body.availableResolutions : null,
-    video.canBeDownloaded = req.body.canBeDownloaded || false,
-    video.minAgeRestriction = req.body.minAgeRestriction || null,
-    video.createdAt = video.createdAt,
-    video.publicationDate = req.body.publicationDate || publicationDateISO,
+    }
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
   .delete('/:id', (req: RequestWithParams<URIParamsVideoModel>, res: Response) => {
-    const video = db.videos.find(({ id }) => id === +req.params.id)
+    const isVideoDeleted = videoRepository.deleteVideoById(+req.params.id)
 
-    if (!video) {
+    if (!isVideoDeleted) {
       res.status(HTTPStatuses.NOTFOUND404).send()
       return
     }
     
-    db.videos = db.videos.filter(({ id }) => id !== video.id)
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
