@@ -2,7 +2,7 @@
   "name": "expressjs-video-api",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "alextula26",
+  "author": "alextula86",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.20.1",
