@@ -77,7 +77,7 @@ describe('/api/posts',  () => {
         title: '',
         shortDescription: null,
         content: '',
-        blogId: '',
+        blogId: '602afe92-7d97-4395-b1b9-6cf98b351bbe',
       })
       .expect(HTTPStatuses.BADREQUEST400, {
         errorsMessages: [
