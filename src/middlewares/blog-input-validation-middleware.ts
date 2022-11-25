@@ -1,0 +1,31 @@
+import { body } from 'express-validator';
+import { blogErrorsValidator } from '../errors'
+
+export const nameBlogValidation = body('name')
+    .not().isEmpty()
+    .withMessage(blogErrorsValidator.nameError.message)
+    .isString()
+    .withMessage(blogErrorsValidator.nameError.message)
+    .trim()
+    .isLength({ min: 3, max: 15 })
+    .withMessage(blogErrorsValidator.nameError.message)
+
+export const descriptionBlogValidation = body('description')
+    .not().isEmpty()
+    .withMessage(blogErrorsValidator.descriptionError.message)
+    .isString()
+    .withMessage(blogErrorsValidator.descriptionError.message)
+    .trim()
+    .isLength({ min: 3, max: 500 })
+    .withMessage(blogErrorsValidator.descriptionError.message)
+
+export const websiteUrlBlogValidation = body('websiteUrl')
+    .not().isEmpty()
+    .withMessage(blogErrorsValidator.websiteUrlError.message)
+    .isString()
+    .withMessage(blogErrorsValidator.websiteUrlError.message)
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage(blogErrorsValidator.websiteUrlError.message)
+    .isURL()
+    .withMessage(blogErrorsValidator.websiteUrlError.message)

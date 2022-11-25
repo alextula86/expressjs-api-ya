@@ -1,0 +1,38 @@
+import { body } from 'express-validator';
+import { postErrorsValidator } from '../errors'
+
+export const titlePostValidation = body('title')
+    .not().isEmpty()
+    .withMessage(postErrorsValidator.titleError.message)
+    .isString()
+    .withMessage(postErrorsValidator.titleError.message)
+    .trim()
+    .isLength({ min: 3, max: 30 })
+    .withMessage(postErrorsValidator.titleError.message)
+
+export const shortPostDescriptionValidation = body('shortDescription')
+    .not().isEmpty()
+    .withMessage(postErrorsValidator.shortDescriptionError.message)
+    .isString()
+    .withMessage(postErrorsValidator.shortDescriptionError.message)
+    .trim()
+    .isLength({ min: 3, max: 100 })
+    .withMessage(postErrorsValidator.shortDescriptionError.message)
+
+export const contentPostValidation = body('content')
+    .not().isEmpty()
+    .withMessage(postErrorsValidator.contentError.message)
+    .isString()
+    .withMessage(postErrorsValidator.contentError.message)
+    .trim()
+    .isLength({ min: 3, max: 1000 })
+    .withMessage(postErrorsValidator.contentError.message)
+
+export const blogIdPostValidation = body('blogId')
+    .not().isEmpty()
+    .withMessage(postErrorsValidator.blogIdError.message)
+    .isString()
+    .withMessage(postErrorsValidator.blogIdError.message)
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage(postErrorsValidator.blogIdError.message)

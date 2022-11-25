@@ -1,7 +1,7 @@
 import { isEmpty, trim, isArray, isNumber, isBoolean, isUndefined, isNull, isString } from 'lodash'
 import { ErrorsMessagesType, ErrorsMessageType, AvailableResolutions } from '../types'
 
-export const errorsValidator = {
+export const videoErrorsValidator = {
   titleError: {
     message: "title is incorrectly",
     field: "title"
@@ -33,33 +33,33 @@ export const errorsValidator = {
   }, 
 }
 
-export const getErrors = (reqBody: any): ErrorsMessageType => {
+export const getVideoErrors = (reqBody: any): ErrorsMessageType => {
     const errorsMessages: ErrorsMessagesType[] = []
 
     if (isNull(reqBody.title) || isEmpty(trim(String(reqBody.title))) || trim(String(reqBody.title)).length > 40) {
-      errorsMessages.push(errorsValidator.titleError)
+      errorsMessages.push(videoErrorsValidator.titleError)
     }
 
     if (isNull(reqBody.author) || isEmpty(trim(String(reqBody.author))) || trim(String(reqBody.author)).length > 20) {
-      errorsMessages.push(errorsValidator.authorError)
+      errorsMessages.push(videoErrorsValidator.authorError)
     }
 
     if (isArray(reqBody.availableResolutions) && (
       isEmpty(reqBody.availableResolutions) || reqBody.availableResolutions.filter((item:AvailableResolutions) => Object.values(AvailableResolutions).includes(item)).length !== reqBody.availableResolutions.length
     )) {
-      errorsMessages.push(errorsValidator.availableResolutionsError)
+      errorsMessages.push(videoErrorsValidator.availableResolutionsError)
     }
 
     if (!isUndefined(reqBody.canBeDownloaded) && !isBoolean(reqBody.canBeDownloaded)) {
-      errorsMessages.push(errorsValidator.canBeDownloadedError)
+      errorsMessages.push(videoErrorsValidator.canBeDownloadedError)
     }
 
     if (isNumber(reqBody.minAgeRestriction) && (reqBody.minAgeRestriction < 1 || reqBody.minAgeRestriction > 18)) {
-      errorsMessages.push(errorsValidator.minAgeRestrictionError)
+      errorsMessages.push(videoErrorsValidator.minAgeRestrictionError)
     }
 
     if (reqBody.publicationDate && !isString(reqBody.publicationDate)) {
-      errorsMessages.push(errorsValidator.publicationDateError)
+      errorsMessages.push(videoErrorsValidator.publicationDateError)
     }
 
     return { errorsMessages: errorsMessages }

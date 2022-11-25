@@ -1,9 +1,10 @@
 import { Router, Response } from "express";
 import { isEmpty } from 'lodash'
 import { videoRepository } from '../repositories'
-import { getVideoViewModel, getErrors } from '../utils'
+import { getVideoErrors } from '../errors'
 import {
   HTTPStatuses,
+  VideoType,
   VideoViewModel,
   URIParamsVideoModel,
   CreateVideoModel,
@@ -15,6 +16,17 @@ import {
 } from '../types'
 
 export const videosRouter = Router()
+
+export const getVideoViewModel = (db: VideoType): VideoViewModel => ({
+  id: db.id,
+  title: db.title,
+  author: db.author,
+  availableResolutions: db.availableResolutions,
+  canBeDownloaded: db.canBeDownloaded,
+  minAgeRestriction: db.minAgeRestriction,
+  createdAt: db.createdAt,
+  publicationDate: db.publicationDate,
+})  
 
 videosRouter
   .get('/', (_, res: Response<VideoViewModel[]>) => {
@@ -34,14 +46,14 @@ videosRouter
     res.status(HTTPStatuses.SUCCESS200).send(videoByIdResponse)
   })
   .post('/', (req: RequestWithBody<CreateVideoModel>, res: Response<VideoViewModel | ErrorsMessageType>) => {
-    const errors = getErrors(req.body)
+    const errors = getVideoErrors(req.body)
 
     if (!isEmpty(errors.errorsMessages)) {
       res.status(HTTPStatuses.BADREQUEST400).send(errors)
       return
     }
 
-    const createdVideo = videoRepository.createdProduct({
+    const createdVideo = videoRepository.createdVideo({
       title: req.body.title,
       author: req.body.author,
       availableResolutions: req.body.availableResolutions,
@@ -51,7 +63,7 @@ videosRouter
     res.status(HTTPStatuses.CREATED201).send(createdVideoResponse)
   })
   .put('/:id', (req: RequestWithParamsAndBody<URIParamsVideoModel, UpdateVideoModel>, res: Response) => {
-    const errors = getErrors(req.body)
+    const errors = getVideoErrors(req.body)
 
     if (!isEmpty(errors.errorsMessages)) {
       res.status(HTTPStatuses.BADREQUEST400).send(errors)

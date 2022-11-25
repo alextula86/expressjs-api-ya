@@ -1,7 +1,7 @@
 import { isEmpty, trim } from 'lodash'
 import { db } from '../mocks'
 
-import { getVideoViewModel, getNextId } from '../utils'
+import { getNextId } from '../utils'
 
 import {
   VideoType,
@@ -14,7 +14,7 @@ export const videoRepository = {
   findVideoById: (id: number): VideoType | undefined => (
     db.videos.find((item) => item.id === id)
   ),
-  createdProduct: ({ title, author, availableResolutions }: CreateVideoModel): VideoType => {
+  createdVideo: ({ title, author, availableResolutions }: CreateVideoModel): VideoType => {
     const createdAtISO = new Date().toISOString()
     const publicationDate = new Date()
     publicationDate.setDate(publicationDate.getDate() + 1)
@@ -33,7 +33,7 @@ export const videoRepository = {
 
     db.videos.push(createdVideo)
 
-    return getVideoViewModel(createdVideo)
+    return createdVideo
   },
   updateVideo: (
     id: number,
