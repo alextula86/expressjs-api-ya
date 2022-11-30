@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from 'body-parser'
+import { runDb } from './repositories/db'
 import { videosRouter } from './routers/videos-router'
 import { blogsRouter } from './routers/blogs-router'
 import { postsRouter } from './routers/posts-router'
@@ -17,6 +18,11 @@ app.use('/api/blogs', blogsRouter)
 app.use('/api/posts', postsRouter)
 app.use('/api/testing', testingRouter)
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`)
-})
+const startApp = async () => {
+  await runDb()
+  app.listen(port, () => {
+    console.log(`App listening on port ${port}`)
+  })
+}
+
+startApp()

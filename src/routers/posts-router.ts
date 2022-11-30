@@ -1,6 +1,7 @@
 import { Router, Response } from "express";
 import { isEmpty } from 'lodash'
-import { postRepository, blogsRepository } from '../repositories'
+import { postRepository } from '../repositories/post/post-db-repository'
+import { blogRepository } from '../repositories/blog/blog-db-repository'
 import {
   authMiddleware,
   titlePostValidation,
@@ -12,7 +13,6 @@ import {
 
 import {
   HTTPStatuses,
-  PostType,
   PostViewModel,
   URIParamsPostModel,
   CreatePostModel,
@@ -25,15 +25,6 @@ import {
 
 export const postsRouter = Router()
 
-export const getPostViewModel = (dbPost: PostType): PostViewModel => ({
-  id: dbPost.id,
-  title: dbPost.title,
-  shortDescription: dbPost.shortDescription,
-  content: dbPost.content,
-  blogId: dbPost.blogId,
-  blogName: dbPost.blogName,
-})
-
 const middlewares = [
   authMiddleware,
   titlePostValidation,
@@ -44,29 +35,27 @@ const middlewares = [
 ]
 
 postsRouter
-  .get('/', (_, res: Response<PostViewModel[]>) => {
-    const allPosts = postRepository.findAllPosts()
-    const allPostsResponse = allPosts.map(getPostViewModel)
-    res.status(HTTPStatuses.SUCCESS200).send(allPostsResponse)
+  .get('/', async (_, res: Response<PostViewModel[]>) => {
+    const allPosts = await postRepository.findAllPosts()
+    res.status(HTTPStatuses.SUCCESS200).send(allPosts)
   })
-  .get('/:id', (req: RequestWithParams<URIParamsPostModel>, res: Response<PostViewModel>) => {
-    const postById = postRepository.findPostById(req.params.id)
+  .get('/:id', async (req: RequestWithParams<URIParamsPostModel>, res: Response<PostViewModel>) => {
+    const postById = await postRepository.findPostById(req.params.id)
 
     if (!postById) {
       return res.status(HTTPStatuses.NOTFOUND404).send()
     }
 
-    const postByIdResponse = getPostViewModel(postById)
-    res.status(HTTPStatuses.SUCCESS200).send(postByIdResponse)
+    res.status(HTTPStatuses.SUCCESS200).send(postById)
   })
-  .post('/', middlewares, (req: RequestWithBody<CreatePostModel>, res: Response<PostViewModel | ErrorsMessageType>) => {
-    const blogById = blogsRepository.findBlogById(req.body.blogId)
+  .post('/', middlewares, async (req: RequestWithBody<CreatePostModel>, res: Response<PostViewModel | ErrorsMessageType>) => {
+    const blogById = await blogRepository.findBlogById(req.body.blogId)
 
     if (isEmpty(blogById)) {
       return res.status(HTTPStatuses.BADREQUEST400).send()
     }
 
-    const createdPost = postRepository.createdPost({
+    const createdPost = await postRepository.createdPost({
       title: req.body.title,
       shortDescription: req.body.shortDescription,
       content: req.body.content,
@@ -74,17 +63,17 @@ postsRouter
       blogName: blogById.name,
     })
 
-    const createdPostResponse = getPostViewModel(createdPost)
-    res.status(HTTPStatuses.CREATED201).send(createdPostResponse)
+    res.status(HTTPStatuses.CREATED201).send(createdPost)
   })
-  .put('/:id', middlewares, (req: RequestWithParamsAndBody<URIParamsPostModel, UpdatePostModel>, res: Response) => {
-    const blogById = blogsRepository.findBlogById(req.body.blogId)
+  .put('/:id', middlewares, async (req: RequestWithParamsAndBody<URIParamsPostModel, UpdatePostModel>, res: Response) => {
+    const blogById = await blogRepository.findBlogById(req.body.blogId)
 
     if (isEmpty(blogById)) {
       return res.status(HTTPStatuses.BADREQUEST400).send()
     }
 
-    const isPostUpdated = postRepository.updatePost(req.params.id, {
+    const isPostUpdated = await postRepository.updatePost({
+      id: req.params.id,
       title: req.body.title,
       shortDescription: req.body.shortDescription,
       content: req.body.content,
@@ -98,8 +87,8 @@ postsRouter
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .delete('/:id', authMiddleware, (req: RequestWithParams<URIParamsPostModel>, res: Response) => {
-    const isPostDeleted = postRepository.deletePostById(req.params.id)
+  .delete('/:id', authMiddleware, async (req: RequestWithParams<URIParamsPostModel>, res: Response) => {
+    const isPostDeleted = await postRepository.deletePostById(req.params.id)
 
     if (!isPostDeleted) {
       return res.status(HTTPStatuses.NOTFOUND404).send()

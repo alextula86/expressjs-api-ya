@@ -1,3 +1,3 @@
-export { CreateVideoModel, UpdateVideoModel, VideoViewModel, URIParamsVideoModel } from './videos'
-export { CreateBlogModel, UpdateBlogModel, BlogViewModel, URIParamsBlogModel } from './blogs'
-export { CreatePostModel, UpdatePostModel, PostViewModel, URIParamsPostModel } from './posts'
+export * from './videos'
+export * from './blogs'
+export * from './posts'

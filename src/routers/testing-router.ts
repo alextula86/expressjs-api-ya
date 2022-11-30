@@ -1,12 +1,16 @@
 import { Router } from "express";
 import { HTTPStatuses } from '../types'
-import { db } from '../mocks'
+
+import { testingRepository } from '../repositories/testing/testing-in-memory-repository'
 
 export const testingRouter = Router()
 
-testingRouter.delete('/all-data', (_, res) => {
-  db.videos = []
-  db.posts = []
-  db.blogs = []
+testingRouter.delete('/all-data', async (_, res) => {
+  const isAllDeleted = await testingRepository.deleteAll()
+
+  if (!isAllDeleted) {
+    return res.status(HTTPStatuses.BADREQUEST400).send()
+  }
+  
   res.status(HTTPStatuses.NOCONTENT204).send()
 })

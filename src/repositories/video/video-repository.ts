@@ -1,20 +1,35 @@
 import { isEmpty, trim } from 'lodash'
-import { db } from '../mocks'
+import { db } from '../../mocks'
 
-import { getNextId } from '../utils'
+import { getNextId } from '../../utils'
 
-import {
-  VideoType,
-  CreateVideoModel,
-  UpdateVideoModel,
-} from '../types'
+import { RepositoryVideoType } from '../../types/services'
+import { VideoViewModel } from '../../types/models'
+import { VideoType } from '../../types'
 
-export const videoRepository = {
-  findAllVideos: (): VideoType[] => db.videos,
-  findVideoById: (id: number): VideoType | undefined => (
-    db.videos.find((item) => item.id === id)
-  ),
-  createdVideo: ({ title, author, availableResolutions }: CreateVideoModel): VideoType => {
+export const getVideoViewModel = (db: VideoType): VideoViewModel => ({
+  id: db.id,
+  title: db.title,
+  author: db.author,
+  availableResolutions: db.availableResolutions,
+  canBeDownloaded: db.canBeDownloaded,
+  minAgeRestriction: db.minAgeRestriction,
+  createdAt: db.createdAt,
+  publicationDate: db.publicationDate,
+})  
+
+export const videoRepository: RepositoryVideoType = {
+  findAllVideos: async () => db.videos.map(getVideoViewModel),
+  findVideoById: async (id) => {
+    const foundVideo: VideoType | undefined = db.videos.find((item) => item.id === id)
+
+    if (!foundVideo) {
+      return null
+    }
+
+    return getVideoViewModel(foundVideo)
+  },
+  createdVideo: async ({ title, author, availableResolutions }) => {
     const createdAtISO = new Date().toISOString()
     const publicationDate = new Date()
     publicationDate.setDate(publicationDate.getDate() + 1)
@@ -33,12 +48,11 @@ export const videoRepository = {
 
     db.videos.push(createdVideo)
 
-    return createdVideo
+    return getVideoViewModel(createdVideo)
   },
-  updateVideo: (
-    id: number,
-    { title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate }: UpdateVideoModel
-    ): boolean => {      
+  updateVideo: async ({ 
+    id, title, author, availableResolutions, canBeDownloaded, minAgeRestriction, publicationDate }
+    ) => {      
       const updatedVideo = db.videos.find((item) => item.id === id)
       
       if (!updatedVideo) {
@@ -60,7 +74,7 @@ export const videoRepository = {
 
       return true    
   },
-  deleteVideoById: (id: number): boolean => {
+  deleteVideoById: async (id) => {
     const videoById = db.videos.find(item => item.id === id)
 
     if (!videoById) {

@@ -1,10 +1,9 @@
 import { Router, Response } from "express";
 import { isEmpty } from 'lodash'
-import { videoRepository } from '../repositories'
+import { videoRepository } from '../repositories/video/video-repository'
 import { getVideoErrors } from '../errors'
 import {
   HTTPStatuses,
-  VideoType,
   VideoViewModel,
   URIParamsVideoModel,
   CreateVideoModel,
@@ -17,60 +16,45 @@ import {
 
 export const videosRouter = Router()
 
-export const getVideoViewModel = (db: VideoType): VideoViewModel => ({
-  id: db.id,
-  title: db.title,
-  author: db.author,
-  availableResolutions: db.availableResolutions,
-  canBeDownloaded: db.canBeDownloaded,
-  minAgeRestriction: db.minAgeRestriction,
-  createdAt: db.createdAt,
-  publicationDate: db.publicationDate,
-})  
-
 videosRouter
-  .get('/', (_, res: Response<VideoViewModel[]>) => {
-    const allVideos = videoRepository.findAllVideos()
-    const allVideosResponse = allVideos.map(getVideoViewModel)
-    res.status(HTTPStatuses.SUCCESS200).send(allVideosResponse)
+  .get('/', async (_, res: Response<VideoViewModel[]>) => {
+    const allVideos = await videoRepository.findAllVideos()
+    res.status(HTTPStatuses.SUCCESS200).send(allVideos)
   })
-  .get('/:id', (req: RequestWithParams<URIParamsVideoModel>, res: Response<VideoViewModel>) => {
-    const videoById = videoRepository.findVideoById(+req.params.id)
+  .get('/:id', async (req: RequestWithParams<URIParamsVideoModel>, res: Response<VideoViewModel>) => {
+    const videoById = await videoRepository.findVideoById(+req.params.id)
 
     if (!videoById) {
       res.status(HTTPStatuses.NOTFOUND404).send()
       return
     }
 
-    const videoByIdResponse = getVideoViewModel(videoById)
-    res.status(HTTPStatuses.SUCCESS200).send(videoByIdResponse)
+    res.status(HTTPStatuses.SUCCESS200).send(videoById)
   })
-  .post('/', (req: RequestWithBody<CreateVideoModel>, res: Response<VideoViewModel | ErrorsMessageType>) => {
+  .post('/', async (req: RequestWithBody<CreateVideoModel>, res: Response<VideoViewModel | ErrorsMessageType>) => {
     const errors = getVideoErrors(req.body)
 
     if (!isEmpty(errors.errorsMessages)) {
-      res.status(HTTPStatuses.BADREQUEST400).send(errors)
-      return
+      return res.status(HTTPStatuses.BADREQUEST400).send(errors)
     }
 
-    const createdVideo = videoRepository.createdVideo({
+    const createdVideo = await videoRepository.createdVideo({
       title: req.body.title,
       author: req.body.author,
       availableResolutions: req.body.availableResolutions,
     })
 
-    const createdVideoResponse = getVideoViewModel(createdVideo)
-    res.status(HTTPStatuses.CREATED201).send(createdVideoResponse)
+    res.status(HTTPStatuses.CREATED201).send(createdVideo)
   })
-  .put('/:id', (req: RequestWithParamsAndBody<URIParamsVideoModel, UpdateVideoModel>, res: Response) => {
+  .put('/:id', async (req: RequestWithParamsAndBody<URIParamsVideoModel, UpdateVideoModel>, res: Response) => {
     const errors = getVideoErrors(req.body)
 
     if (!isEmpty(errors.errorsMessages)) {
-      res.status(HTTPStatuses.BADREQUEST400).send(errors)
-      return
+      return res.status(HTTPStatuses.BADREQUEST400).send(errors)
     }
 
-    const isVideoUpdated = videoRepository.updateVideo(+req.params.id, {
+    const isVideoUpdated = await videoRepository.updateVideo({
+      id: +req.params.id,
       title: req.body.title,
       author: req.body.author,
       availableResolutions: req.body.availableResolutions,
@@ -80,18 +64,16 @@ videosRouter
     })
 
     if (!isVideoUpdated) {
-      res.status(HTTPStatuses.NOTFOUND404).send()
-      return
+      return res.status(HTTPStatuses.NOTFOUND404).send()
     }
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .delete('/:id', (req: RequestWithParams<URIParamsVideoModel>, res: Response) => {
-    const isVideoDeleted = videoRepository.deleteVideoById(+req.params.id)
+  .delete('/:id', async (req: RequestWithParams<URIParamsVideoModel>, res: Response) => {
+    const isVideoDeleted = await videoRepository.deleteVideoById(+req.params.id)
 
     if (!isVideoDeleted) {
-      res.status(HTTPStatuses.NOTFOUND404).send()
-      return
+      return res.status(HTTPStatuses.NOTFOUND404).send()
     }
     
     res.status(HTTPStatuses.NOCONTENT204).send()

@@ -1,0 +1,1 @@
+export { RepositoryPostType } from './RepositoryPostType'

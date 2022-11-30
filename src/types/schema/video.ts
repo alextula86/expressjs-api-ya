@@ -19,10 +19,4 @@ export enum AvailableResolutions {
     createdAt: string
     publicationDate: string
   }
-
-  /*export type ErrorsMessagesType = {
-    message: string,
-    field: string
-  }
-
-  export type ErrorsMessageType = { errorsMessages: ErrorsMessagesType[] }*/
+  

@@ -32,7 +32,7 @@ describe('/api/posts',  () => {
         websiteUrl: 'https://cont.ws/2425095',
       })
 
-    createdBlog2 = createdBlog2Responce.body    
+    createdBlog2 = createdBlog2Responce.body
   })
 
   it('should return status 200 and empty array', async () => {
@@ -147,6 +147,7 @@ describe('/api/posts',  () => {
       content: 'Контент очень хорошего поста 1',
       blogId: createdBlog1.id,
       blogName: createdBlog1.name,
+      createdAt: expect.any(String),
     })
 
     await request(app)
@@ -181,6 +182,7 @@ describe('/api/posts',  () => {
       content: 'Контент очень хорошего поста 2',
       blogId: createdBlog2.id,
       blogName: createdBlog2.name,
+      createdAt: expect.any(String),
     })
 
     await request(app)
@@ -317,7 +319,21 @@ describe('/api/posts',  () => {
       .expect(HTTPStatuses.NOCONTENT204)
 
     await request(app)
+      .delete(`/api/blogs/${createdBlog1.id}`)
+      .set('Authorization', `Basic ${Buffer.from(`${process.env.LOGIN}:${process.env.PASSWORD}`, 'utf8').toString('base64')}`)
+      .expect(HTTPStatuses.NOCONTENT204)
+
+    await request(app)
+      .delete(`/api/blogs/${createdBlog2.id}`)
+      .set('Authorization', `Basic ${Buffer.from(`${process.env.LOGIN}:${process.env.PASSWORD}`, 'utf8').toString('base64')}`)
+      .expect(HTTPStatuses.NOCONTENT204)      
+
+    await request(app)
       .get('/api/posts')
       .expect(HTTPStatuses.SUCCESS200, [])
+
+    await request(app)
+      .get('/api/blogs')
+      .expect(HTTPStatuses.SUCCESS200, [])      
   })
 })
