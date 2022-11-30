@@ -7,13 +7,14 @@ import { RepositoryPostType } from '../../types/services'
 import { PostViewModel } from '../../types/models'
 import { PostType } from '../../types'
 
-export const getPostViewModel = (dbPost: PostType): PostViewModel => ({
-  id: dbPost.id,
-  title: dbPost.title,
-  shortDescription: dbPost.shortDescription,
-  content: dbPost.content,
-  blogId: dbPost.blogId,
-  blogName: dbPost.blogName,
+export const getPostViewModel = (db: PostType): PostViewModel => ({
+  id: db.id,
+  title: db.title,
+  shortDescription: db.shortDescription,
+  content: db.content,
+  blogId: db.blogId,
+  blogName: db.blogName,
+  createdAt: db.createdAt,
 })
 
 export const postRepository: RepositoryPostType = {
@@ -35,6 +36,7 @@ export const postRepository: RepositoryPostType = {
       content: trim(String(content)),
       blogId,
       blogName,
+      createdAt: new Date().toISOString(),
     }
 
     db.posts.push(createdPost)

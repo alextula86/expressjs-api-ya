@@ -12,6 +12,7 @@ export const getBlogViewModel = (db: BlogType): BlogViewModel => ({
   name: db.name,
   description: db.description,
   websiteUrl: db.websiteUrl,
+  createdAt: db.createdAt,
 })
 
 export const blogRepository: RepositoryBlogType = {
@@ -31,6 +32,7 @@ export const blogRepository: RepositoryBlogType = {
       name: trim(String(name)),
       description: trim(String(description)),
       websiteUrl: trim(String(websiteUrl)),
+      createdAt: new Date().toISOString()
     }
 
     db.blogs.push(createdBlog)
