@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "name": "expressjs-video-api",
+  "version": 3,
+  "name": "expressjs-api",
   "builds": [
      {
       "src": "src/index.ts",
