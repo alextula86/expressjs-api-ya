@@ -10,7 +10,7 @@ if (!mongoUri) {
 }
 
 const client = new MongoClient(mongoUri)
-const db = client.db('bloggers')
+const db = client.db()
 
 export const blogCollection = db.collection<BlogType>('blogs')
 export const postCollection = db.collection<PostType>('posts')
