@@ -18,7 +18,7 @@ export const postCollection = db.collection<PostType>('posts')
 export async function runDb() {
   try {
     await client.connect()
-    await client.db('blogs').command({ ping: 1 })
+    await client.db().command({ ping: 1 })
     console.log('Connected successfully to server')
   } catch {
     console.log('Can`t connect to db')
