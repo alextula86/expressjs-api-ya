@@ -11,7 +11,7 @@ describe('/api/posts',  () => {
 
   beforeAll(async () => {
     await request(app).delete('/api/testing/all-data')
-    
+
     const createdBlog1Responce = await request(app)
       .post('/api/blogs/')
       .set('Authorization', `Basic ${Buffer.from(`${process.env.LOGIN}:${process.env.PASSWORD}`, 'utf8').toString('base64')}`)

@@ -1,9 +1,9 @@
 import request from 'supertest'
 import * as dotenv from 'dotenv'
 dotenv.config()
-import { app } from '../../src'
-import { BlogType, HTTPStatuses } from '../../src/types'
-import { blogErrorsValidator } from '../../src/errors'
+import { app } from '../src'
+import { BlogType, HTTPStatuses } from '../src/types'
+import { blogErrorsValidator } from '../src/errors'
 
 describe('/api/blogs',  () => {
   beforeAll(async () => {
