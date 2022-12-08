@@ -20,7 +20,6 @@ export const blogRepository: RepositoryBlogType = {
     }
 
     const totalCount = await blogCollection.count(filter)
-    console.log('totalCount', totalCount)
     const pagesCount = Math.ceil(totalCount / pageSize)
     const skip = (+pageNumber - 1) * +pageSize
 
@@ -33,7 +32,7 @@ export const blogRepository: RepositoryBlogType = {
 
     return this._getBlogsViewModelDetail({
       items: blogs,
-      totalCount: totalCount + 1,
+      totalCount: totalCount,
       pagesCount,
       page: +pageNumber,
       pageSize: +pageSize,
