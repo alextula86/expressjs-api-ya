@@ -11,7 +11,7 @@ export const postRepository: RepositoryPostType = {
     pageNumber = 1,
     pageSize = 10,
     sortBy = 'createdAt',
-    sortDirection =  SortDirection.ASC,
+    sortDirection =  SortDirection.DESC,
   }) {
     const filter: any = {}
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }

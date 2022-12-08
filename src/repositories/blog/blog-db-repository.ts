@@ -10,7 +10,7 @@ export const blogRepository: RepositoryBlogType = {
     pageNumber = 1,
     pageSize = 10,
     sortBy = 'createdAt',
-    sortDirection =  SortDirection.ASC,
+    sortDirection =  SortDirection.DESC,
   }) {
     const filter: any = {}
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
@@ -52,7 +52,7 @@ export const blogRepository: RepositoryBlogType = {
     pageNumber = 1,
     pageSize = 10,
     sortBy = 'createdAt',
-    sortDirection =  SortDirection.ASC,
+    sortDirection =  SortDirection.DESC,
   }) {
     const filter: any = { blogId: { $eq: blogId } }
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
