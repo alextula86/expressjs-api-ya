@@ -5,18 +5,29 @@ import {
   nameBlogValidation,
   descriptionBlogValidation,
   websiteUrlBlogValidation,
+  titlePostValidation,
+  shortPostDescriptionValidation,
+  contentPostValidation,
   inputValidationMiddleware,
 } from '../middlewares'
 
 import {
   HTTPStatuses,
   BlogViewModel,
+  PostViewModel,
+  BlogsViewModelDetail,
+  PostsViewModelDetail,
   URIParamsBlogModel,
+  URIParamsPostsByBlogId,
+  QueryBlogModel,
   CreateBlogModel,
+  CreatePostModelWithoutBlogId,
   UpdateBlogModel,
   RequestWithBody,
+  RequestWithQuery,
   RequestWithParams,
   RequestWithParamsAndBody,
+  RequestWithParamsAndQuery,
   ErrorsMessageType,
 } from '../types'
 
@@ -30,19 +41,51 @@ const middlewares = [
   inputValidationMiddleware
 ]
 
+const middlewaresPost = [
+  authMiddleware,
+  titlePostValidation,
+  shortPostDescriptionValidation,
+  contentPostValidation,
+  inputValidationMiddleware
+]
+
 blogsRouter
-  .get('/', async (_, res: Response<BlogViewModel[]>) => {
-    const allBlogs = await blogRepository.findAllBlogs()
+  .get('/', async (req: RequestWithQuery<QueryBlogModel>, res: Response<BlogsViewModelDetail>) => {
+    const allBlogs = await blogRepository.findAllBlogs({
+      searchNameTerm: req.query.searchNameTerm,
+      pageNumber: req.query.pageNumber, 
+      pageSize: req.query.pageSize,
+      sortBy: req.query.sortBy,
+      sortDirection: req.query.sortDirection,
+    })
+
     res.status(HTTPStatuses.SUCCESS200).send(allBlogs)
   })
   .get('/:id', async (req: RequestWithParams<URIParamsBlogModel>, res: Response<BlogViewModel>) => {
-    const blogoById = await blogRepository.findBlogById(req.params.id)
+    const blogById = await blogRepository.findBlogById(req.params.id)
 
-    if (!blogoById) {
+    if (!blogById) {
       return res.status(HTTPStatuses.NOTFOUND404).send()
     }
 
-    res.status(HTTPStatuses.SUCCESS200).send(blogoById)
+    res.status(HTTPStatuses.SUCCESS200).send(blogById)
+  })
+  .get('/:blogId/posts', async (req: RequestWithParamsAndQuery<URIParamsPostsByBlogId, QueryBlogModel>, res: Response<PostsViewModelDetail>) => {
+    const blogById = await blogRepository.findBlogById(req.params.blogId)
+
+    if (!blogById) {
+      return res.status(HTTPStatuses.NOTFOUND404).send()
+    }
+
+    const postsByBlogId = await blogRepository.findPostsByBlogId(req.params.blogId, {
+      searchNameTerm: req.query.searchNameTerm,
+      pageNumber: req.query.pageNumber, 
+      pageSize: req.query.pageSize,
+      sortBy: req.query.sortBy,
+      sortDirection: req.query.sortDirection,
+    })
+
+    res.status(HTTPStatuses.SUCCESS200).send(postsByBlogId)
   })
   .post('/', middlewares, async (req: RequestWithBody<CreateBlogModel>, res: Response<BlogViewModel | ErrorsMessageType>) => {
     const createdBlog = await blogRepository.createdBlog({
@@ -53,6 +96,23 @@ blogsRouter
 
     res.status(HTTPStatuses.CREATED201).send(createdBlog)
   })
+  .post('/:blogId/posts', middlewaresPost, async (req: RequestWithParamsAndBody<URIParamsPostsByBlogId, CreatePostModelWithoutBlogId>, res: Response<PostViewModel | ErrorsMessageType>) => {
+    const blogById = await blogRepository.findBlogById(req.params.blogId)
+
+    if (!blogById) {
+      return res.status(HTTPStatuses.NOTFOUND404).send()
+    }
+
+    const createdPostByBlogId = await blogRepository.createdPostByBlogId({
+      title: req.body.title,
+      shortDescription: req.body.shortDescription,
+      content: req.body.content,
+      blogId: blogById.id,
+      blogName: blogById.name,
+    })
+
+    res.status(HTTPStatuses.CREATED201).send(createdPostByBlogId)
+  })  
   .put('/:id', middlewares, async (req: RequestWithParamsAndBody<URIParamsBlogModel, UpdateBlogModel>, res: Response) => {
     const isBlogUpdated = await blogRepository.updateBlog({
       id: req.params.id,

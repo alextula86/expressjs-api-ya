@@ -18,8 +18,10 @@ export const getPostViewModel = (db: PostType): PostViewModel => ({
 })
 
 export const postRepository: RepositoryPostType = {
-  findAllPosts: async () => db.posts.map(getPostViewModel),
-  findPostById: async (id) => {
+  async findAllPosts() {
+    return this._getPostsViewModelDetail(db.posts)
+  },
+  async findPostById(id) {
     const foundPost: PostType | undefined = db.posts.find((item) => item.id === id)
 
     if (!foundPost) {
@@ -28,7 +30,7 @@ export const postRepository: RepositoryPostType = {
 
     return getPostViewModel(foundPost)
   },  
-  createdPost: async ({ title, shortDescription, content, blogId, blogName }) => {
+  async createdPost({ title, shortDescription, content, blogId, blogName }) {
     const createdPost: PostType = {
       id: getNextStrId(),
       title: trim(String(title)),
@@ -43,7 +45,7 @@ export const postRepository: RepositoryPostType = {
 
     return getPostViewModel(createdPost)
   },
-  updatePost: async ({ id, title, shortDescription, content, blogId, blogName })=> {  
+  async updatePost({ id, title, shortDescription, content, blogId, blogName }) {  
       const updatedPost: PostType | undefined = db.posts.find((item) => item.id === id)
       
       if (!updatedPost) {
@@ -59,7 +61,7 @@ export const postRepository: RepositoryPostType = {
 
       return true    
   },
-  deletePostById: async (id) => {
+  async deletePostById(id) {
     const postById: PostType | undefined = db.posts.find(item => item.id === id)
 
     if (!postById) {
@@ -69,4 +71,32 @@ export const postRepository: RepositoryPostType = {
     db.posts = db.posts.filter(({ id }) => id !== postById.id)
     return true
   },
+  _getPostViewModel(dbPost) {
+    return {
+      id: dbPost.id,
+      title: dbPost.title,
+      shortDescription: dbPost.shortDescription,
+      content: dbPost.content,
+      blogId: dbPost.blogId,
+      blogName: dbPost.blogName,
+      createdAt: dbPost.createdAt,
+    }
+  },
+  _getPostsViewModelDetail(dbPosts) {
+    return {
+      pagesCount: 0,
+      page: 0,
+      pageSize: 0,
+      totalCount: 0,
+      items: dbPosts.map(post => ({
+        id: post.id,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt,
+      })),
+    }
+  },    
 }

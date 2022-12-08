@@ -4,29 +4,27 @@ import { db } from '../../mocks'
 import { getNextStrId } from '../../utils'
 
 import { RepositoryBlogType } from '../../types/services'
-import { BlogViewModel } from '../../types/models'
-import { BlogType } from '../../types'
-
-export const getBlogViewModel = (db: BlogType): BlogViewModel => ({
-  id: db.id,
-  name: db.name,
-  description: db.description,
-  websiteUrl: db.websiteUrl,
-  createdAt: db.createdAt,
-})
+import { BlogType, PostType } from '../../types'
 
 export const blogRepository: RepositoryBlogType = {
-  findAllBlogs: async () => db.blogs.map(getBlogViewModel),
-  findBlogById: async (id) => {
+  async findAllBlogs() {
+    return this._getBlogsViewModelDetail(db.blogs)
+  },
+  async findBlogById(id) {
     const foundBlog: BlogType | undefined = db.blogs.find((item) => item.id === id)
 
     if (!foundBlog) {
       return null
     }
 
-    return getBlogViewModel(foundBlog)
+    return this._getBlogViewModel(foundBlog)
   },
-  createdBlog: async ({ name, description, websiteUrl }) => {
+  async findPostsByBlogId(blogId) {
+    const posts: PostType[] = db.posts.filter((item) => item.id === blogId)
+
+    return this._getPostsViewModelDetail(posts)
+  },  
+  async createdBlog({ name, description, websiteUrl }) {
     const createdBlog: BlogType = {
       id: getNextStrId(),
       name: trim(String(name)),
@@ -37,9 +35,24 @@ export const blogRepository: RepositoryBlogType = {
 
     db.blogs.push(createdBlog)
 
-    return getBlogViewModel(createdBlog)
+    return this._getBlogViewModel(createdBlog)
   },
-  updateBlog: async ({id, name, description, websiteUrl }) => {      
+  async createdPostByBlogId({ title, shortDescription, content, blogId, blogName }) {
+    const createdPost: PostType = {
+      id: getNextStrId(),
+      title: trim(String(title)),
+      shortDescription: trim(String(shortDescription)),
+      content: trim(String(content)),
+      blogId,
+      blogName,
+      createdAt: new Date().toISOString(),
+    }
+
+    db.posts.push(createdPost)
+
+    return this._getPostViewModel(createdPost)
+  },
+  async updateBlog({id, name, description, websiteUrl }) {      
       const updatedBlog: BlogType | undefined = db.blogs.find((item) => item.id === id)
 
       if (!updatedBlog) {
@@ -53,7 +66,7 @@ export const blogRepository: RepositoryBlogType = {
 
       return true    
   },
-  deleteBlogById: async (id) => {
+  async deleteBlogById(id) {
     const blogById: BlogType | undefined = db.blogs.find(item => item.id === id)
 
     if (!blogById) {
@@ -63,4 +76,56 @@ export const blogRepository: RepositoryBlogType = {
     db.blogs = db.blogs.filter(({ id }) => id !== blogById.id)
     return true
   },
+  _getBlogViewModel(dbBlog) {    
+    return {
+      id: dbBlog.id,
+      name: dbBlog.name,
+      description: dbBlog.description,
+      websiteUrl: dbBlog.websiteUrl,
+      createdAt: dbBlog.createdAt,
+    }
+  },
+  _getPostViewModel(dbPost) {
+    return {
+      id: dbPost.id,
+      title: dbPost.title,
+      shortDescription: dbPost.shortDescription,
+      content: dbPost.content,
+      blogId: dbPost.blogId,
+      blogName: dbPost.blogName,
+      createdAt: dbPost.createdAt,
+    }
+  },
+  _getBlogsViewModelDetail(dbBlogs) {
+    return {
+      pagesCount: 0,
+      page: 0,
+      pageSize: 0,
+      totalCount: 0,
+      items: dbBlogs.map(blog => ({
+        id: blog.id,
+        name: blog.name,
+        description: blog.description,
+        websiteUrl: blog.websiteUrl,
+        createdAt: blog.createdAt,
+      })),
+    }
+  },
+  _getPostsViewModelDetail(dbPosts) {
+    return {
+      pagesCount: 0,
+      page: 0,
+      pageSize: 0,
+      totalCount: 0,
+      items: dbPosts.map(post => ({
+        id: post.id,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt,
+      })),
+    }
+  },  
 }

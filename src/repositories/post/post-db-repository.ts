@@ -3,36 +3,52 @@ import { postCollection } from '../db'
 
 import { getNextStrId } from '../../utils'
 
-import { RepositoryPostType } from '../../types/services'
-import { PostViewModel } from '../../types/models'
-import { PostType } from '../../types'
-
-export const getPostViewModel = (db: PostType): PostViewModel => ({
-  id: db.id,
-  title: db.title,
-  shortDescription: db.shortDescription,
-  content: db.content,
-  blogId: db.blogId,
-  blogName: db.blogName,
-  createdAt: db.createdAt,
-})
+import { RepositoryPostType, PostType, SortDirection } from '../../types'
 
 export const postRepository: RepositoryPostType = {
-  findAllPosts: async () => {
-    const blogs = await postCollection.find().toArray()
+  async findAllPosts({
+    searchNameTerm = null,
+    pageNumber = 1,
+    pageSize = 10,
+    sortBy = 'createdAt',
+    sortDirection =  SortDirection.ASC,
+  }) {
+    const filter: any = {}
+    const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
+    
+    if (searchNameTerm) {
+      filter.name = { $regex: searchNameTerm }
+    }
 
-    return blogs.map(getPostViewModel)
+    const totalCount = await postCollection.count(filter)
+    const pagesCount = Math.ceil(totalCount / pageSize)
+    const skip = (+pageNumber - 1) * +pageSize
+
+    const posts: PostType[] = await postCollection
+      .find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(+pageSize)
+      .toArray()
+
+    return this._getPostsViewModelDetail({
+      items: posts,
+      totalCount,
+      pagesCount,
+      page: +pageNumber,
+      pageSize: +pageSize,
+    })
   },
-  findPostById: async (id) => {
+  async findPostById(id) {
     const foundPost: PostType | null = await postCollection.findOne({ id })
 
     if (!foundPost) {
       return null
     }
 
-    return getPostViewModel(foundPost)
+    return this._getPostViewModel(foundPost)
   },
-  createdPost: async ({ title, shortDescription, content, blogId, blogName }) => {
+  async createdPost({ title, shortDescription, content, blogId, blogName }) {
     const createdPost: PostType = {
       id: getNextStrId(),
       title: trim(String(title)),
@@ -45,9 +61,9 @@ export const postRepository: RepositoryPostType = {
 
     await postCollection.insertOne(createdPost)
 
-    return getPostViewModel(createdPost)
+    return this._getPostViewModel(createdPost)
   },
-  updatePost: async ({ id, title, shortDescription, content, blogId, blogName })=> {  
+  async updatePost({ id, title, shortDescription, content, blogId, blogName }) {  
     const { matchedCount } = await postCollection.updateOne({ id }, {
       $set: {
         title: trim(String(title)),
@@ -60,9 +76,37 @@ export const postRepository: RepositoryPostType = {
 
     return matchedCount === 1   
   },
-  deletePostById: async (id) => {
+  async deletePostById(id) {
     const { deletedCount } = await postCollection.deleteOne({ id })
 
     return deletedCount === 1
   },
+  _getPostViewModel(dbPost) {
+    return {
+      id: dbPost.id,
+      title: dbPost.title,
+      shortDescription: dbPost.shortDescription,
+      content: dbPost.content,
+      blogId: dbPost.blogId,
+      blogName: dbPost.blogName,
+      createdAt: dbPost.createdAt,
+    }
+  },
+  _getPostsViewModelDetail({ items, totalCount, pagesCount, page, pageSize }) {
+    return {
+      pagesCount,
+      page,
+      pageSize,
+      totalCount,
+      items: items.map(item => ({
+        id: item.id,
+        title: item.title,
+        shortDescription: item.shortDescription,
+        content: item.content,
+        blogId: item.blogId,
+        blogName: item.blogName,
+        createdAt: item.createdAt,
+      })),
+    }
+  },  
 }
