@@ -17,7 +17,7 @@ export const postRepository: RepositoryPostType = {
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
     
     if (searchNameTerm) {
-      filter.title = { $regex: searchNameTerm }
+      filter.title = { $regex: searchNameTerm, $options: 'i' }
     }
 
     const totalCount = await postCollection.count(filter)

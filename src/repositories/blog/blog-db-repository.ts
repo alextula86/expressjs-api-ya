@@ -16,7 +16,7 @@ export const blogRepository: RepositoryBlogType = {
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
     
     if (searchNameTerm) {
-      filter.name = { $regex: searchNameTerm }
+      filter.name = { $regex: searchNameTerm, $options: 'i' }
     }
 
     const totalCount = await blogCollection.count(filter)
@@ -58,7 +58,7 @@ export const blogRepository: RepositoryBlogType = {
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
 
     if (searchNameTerm) {
-      filter.title = { $regex: searchNameTerm }
+      filter.title = { $regex: searchNameTerm, $options: 'i' }
     }
 
     const totalCount = await postCollection.count(filter)
