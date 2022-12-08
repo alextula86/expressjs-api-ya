@@ -32,7 +32,7 @@ export const blogRepository: RepositoryBlogType = {
 
     return this._getBlogsViewModelDetail({
       items: blogs,
-      totalCount: totalCount,
+      totalCount,
       pagesCount,
       page: +pageNumber,
       pageSize: +pageSize,
