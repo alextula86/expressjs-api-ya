@@ -27,7 +27,7 @@ export const postRepository: RepositoryPostType = {
       .find(filter)
       .sort(sort)
       .skip(skip)
-      .limit(+pageSize)
+      .limit(size)
       .toArray()
 
     return this._getPostsViewModelDetail({

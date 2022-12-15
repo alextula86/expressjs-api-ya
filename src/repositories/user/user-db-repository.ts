@@ -32,7 +32,7 @@ export const userRepository: RepositoryUserType = {
       .find(filter)
       .sort(sort)
       .skip(skip)
-      .limit(+pageSize)
+      .limit(size)
       .toArray()
 
     return this._getUsersViewModelDetail({

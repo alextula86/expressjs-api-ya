@@ -27,7 +27,7 @@ export const blogRepository: RepositoryBlogType = {
       .find(filter)
       .sort(sort)
       .skip(skip)
-      .limit(+pageSize)
+      .limit(size)
       .toArray()
 
     return this._getBlogsViewModelDetail({
@@ -72,7 +72,7 @@ export const blogRepository: RepositoryBlogType = {
       .find(filter)
       .sort(sort)
       .skip(skip)
-      .limit(+pageSize)
+      .limit(size)
       .toArray()
 
     return this._getPostsViewModelDetail({
