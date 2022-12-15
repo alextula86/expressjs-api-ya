@@ -34,5 +34,5 @@ export const blogIdPostValidation = body('blogId')
     .isString()
     .withMessage(postsErrorsValidator.blogIdError.message)
     .trim()
-    /*.isLength({ min: 1, max: 14 })
-    .withMessage(postsErrorsValidator.blogIdError.message)*/
+    .isLength({ min: 1, max: 20 })
+    .withMessage(postsErrorsValidator.blogIdError.message)
