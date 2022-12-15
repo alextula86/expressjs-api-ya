@@ -1,28 +1,27 @@
-import { trim } from 'lodash'
-import { postCollection } from '../db'
-
-import { getNextStrId } from '../../utils'
-
+import { postCollection } from '../../repositories/db'
 import { RepositoryPostType, PostType, SortDirection } from '../../types'
 
 export const postRepository: RepositoryPostType = {
   async findAllPosts({
-    searchNameTerm = null,
-    pageNumber = 1,
-    pageSize = 10,
-    sortBy = 'createdAt',
-    sortDirection =  SortDirection.DESC,
+    searchNameTerm,
+    pageNumber,
+    pageSize,
+    sortBy,
+    sortDirection,
   }) {
+    const number = pageNumber ? Number(pageNumber) : 1
+    const size = pageSize ? Number(pageSize) : 10
+
     const filter: any = {}
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
-    
+
     if (searchNameTerm) {
       filter.title = { $regex: searchNameTerm, $options: 'i' }
     }
 
     const totalCount = await postCollection.count(filter)
-    const pagesCount = Math.ceil(totalCount / pageSize)
-    const skip = (+pageNumber - 1) * +pageSize
+    const pagesCount = Math.ceil(totalCount / size)
+    const skip = (number - 1) * size
 
     const posts: PostType[] = await postCollection
       .find(filter)
@@ -35,8 +34,8 @@ export const postRepository: RepositoryPostType = {
       items: posts,
       totalCount,
       pagesCount,
-      page: +pageNumber,
-      pageSize: +pageSize,
+      page: number,
+      pageSize: size,
     })
   },
   async findPostById(id) {
@@ -48,27 +47,17 @@ export const postRepository: RepositoryPostType = {
 
     return this._getPostViewModel(foundPost)
   },
-  async createdPost({ title, shortDescription, content, blogId, blogName }) {
-    const createdPost: PostType = {
-      id: getNextStrId(),
-      title: trim(String(title)),
-      shortDescription: trim(String(shortDescription)),
-      content: trim(String(content)),
-      blogId,
-      blogName,
-      createdAt: new Date().toISOString(),
-    }
-
+  async createdPost(createdPost) {
     await postCollection.insertOne(createdPost)
 
     return this._getPostViewModel(createdPost)
   },
-  async updatePost({ id, title, shortDescription, content, blogId, blogName }) {  
+  async updatePost({ id, title, shortDescription, content, blogId, blogName }) {
     const { matchedCount } = await postCollection.updateOne({ id }, {
       $set: {
-        title: trim(String(title)),
-        shortDescription: trim(String(shortDescription)),
-        content: trim(String(content)),
+        title,
+        shortDescription,
+        content,
         blogId,
         blogName,
       }
@@ -108,5 +97,5 @@ export const postRepository: RepositoryPostType = {
         createdAt: item.createdAt,
       })),
     }
-  },  
+  },
 }

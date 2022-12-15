@@ -1,5 +1,4 @@
 export * from './BlogViewModel'
-export * from './BlogsViewModelDetail'
 export * from './QueryBlogModel'
 export * from './CreateBlogModel'
 export * from './UpdateBlogModel'

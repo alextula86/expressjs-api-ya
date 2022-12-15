@@ -1,5 +1,4 @@
 export * from './PostViewModel'
-export * from './PostsViewModelDetail'
 export * from './QueryPostModel'
 export * from './CreatePostModel'
 export * from './UpdatePostModel'

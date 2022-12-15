@@ -1,1 +1,0 @@
-export { RepositoryVideoType } from './RepositoryVideoType'

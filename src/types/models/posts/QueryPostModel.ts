@@ -1,12 +1,9 @@
-export enum SortDirection {
-  ASC = 'asc', 
-  DESC = 'desc', 
-}
+import { SortDirection } from '../../enums'
 
 export type QueryPostModel = {
-  searchNameTerm: string | null
-  pageNumber: number
-  pageSize: number
+  searchNameTerm: string
+  pageNumber: string
+  pageSize: string
   sortBy: string
   sortDirection: SortDirection
 }

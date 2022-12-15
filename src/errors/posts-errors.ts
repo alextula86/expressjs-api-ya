@@ -1,4 +1,4 @@
-export const postErrorsValidator = {
+export const postsErrorsValidator = {
   titleError: {
     message: "title is incorrectly",
     field: "title"

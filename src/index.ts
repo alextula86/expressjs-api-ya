@@ -1,9 +1,9 @@
 import express from "express";
 import bodyParser from 'body-parser'
 import { runDb } from './repositories/db'
-import { videosRouter } from './routers/videos-router'
 import { blogsRouter } from './routers/blogs-router'
 import { postsRouter } from './routers/posts-router'
+import { usersRouter } from './routers/users-router'
 import { testingRouter } from './routers/testing-router'
 
 export const app = express()
@@ -13,9 +13,9 @@ const jsonBodyMiddleware = bodyParser.json()
 
 app.use(jsonBodyMiddleware)
 
-app.use('/api/videos', videosRouter)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/posts', postsRouter)
+app.use('/api/users', usersRouter)
 app.use('/api/testing', testingRouter)
 
 const startApp = async () => {

@@ -1,4 +1,4 @@
-export const blogErrorsValidator = {
+export const blogsErrorsValidator = {
   nameError: {
     message: "name is incorrectly",
     field: "name"

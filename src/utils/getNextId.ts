@@ -1,5 +1,5 @@
 import { uniqueId } from 'lodash'
 
-export const getNextId = () => Number(uniqueId())
+export const getNextId = () => Date.now()
 
-export const getNextStrId = () => String(uniqueId())
+export const getNextStrId = () => Date.now().toString()
