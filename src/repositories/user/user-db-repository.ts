@@ -13,15 +13,15 @@ export const userRepository: RepositoryUserType = {
     const number = pageNumber ? Number(pageNumber) : 1
     const size = pageSize ? Number(pageSize) : 10
 
-    const filter: any = {}
+    const filter: any = { $or: [] }
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
 
     if (searchLoginTerm) {
-      filter.login = { $regex: searchLoginTerm, $options: 'i' }
+      filter['$or'].push({ login: { $regex: searchLoginTerm, $options: 'i' } })
     }
 
     if (searchEmailTerm) {
-      filter.email = { $regex: searchEmailTerm, $options: 'i' }
+      filter['$or'].push({ email: { $regex: searchEmailTerm, $options: 'i' } })
     }
 
     const totalCount = await userCollection.count(filter)
