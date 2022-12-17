@@ -1,3 +1,4 @@
+import { isEmpty } from 'lodash'
 import { userCollection } from '../db'
 import { RepositoryUserType, SortDirection, UserType } from '../../types'
 
@@ -13,19 +14,19 @@ export const userRepository: RepositoryUserType = {
     const number = pageNumber ? Number(pageNumber) : 1
     const size = pageSize ? Number(pageSize) : 10
 
-    const filter: any = {}
+    const query: any = []
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
 
     if (searchLoginTerm) {
-      filter['$or'].push({ login: { $regex: searchLoginTerm, $options: 'i' } })
+      query.push({ login: { $regex: searchLoginTerm, $options: 'i' } })
     }
 
     if (searchEmailTerm) {
-      filter['$or'].push({ email: { $regex: searchEmailTerm, $options: 'i' } })
+      query.push({ email: { $regex: searchEmailTerm, $options: 'i' } })
     }
 
-    console.log(filter)
-
+    const filter = !isEmpty(query) ? { $or: query } : {}
+ 
     const totalCount = await userCollection.count(filter)
     const pagesCount = Math.ceil(totalCount / size)
     const skip = (number - 1) * size

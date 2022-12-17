@@ -40,7 +40,7 @@ usersRouter
       pageSize: req.query.pageSize,
       sortBy: req.query.sortBy,
       sortDirection: req.query.sortDirection,
-    })  
+    })   
 
     res.status(HTTPStatuses.SUCCESS200).send(allUsers)
   })
