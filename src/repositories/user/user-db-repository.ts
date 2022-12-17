@@ -24,6 +24,8 @@ export const userRepository: RepositoryUserType = {
       filter['$or'].push({ email: { $regex: searchEmailTerm, $options: 'i' } })
     }
 
+    console.log(filter)
+
     const totalCount = await userCollection.count(filter)
     const pagesCount = Math.ceil(totalCount / size)
     const skip = (number - 1) * size
