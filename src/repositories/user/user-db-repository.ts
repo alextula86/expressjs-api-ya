@@ -62,6 +62,16 @@ export const userRepository: RepositoryUserType = {
 
     return deletedCount === 1
   },
+  async findByLoginOrEmail(loginOrEmail: string) {
+    const foundUser: UserType | null = await userCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
+
+    if (!foundUser) {
+      return null
+    }
+
+    return foundUser
+  },
+  
   _getUserViewModel(dbUser) {
     return {
       id: dbUser.id,

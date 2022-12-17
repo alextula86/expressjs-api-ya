@@ -51,6 +51,22 @@ export const userService: ServiceUserType = {
 
     return isDeleteUserById
   },
+  async checkCredentials(loginOrEmail, password) {
+    const user = await userRepository.findByLoginOrEmail(loginOrEmail)
+
+    if (!user) {
+      return false
+    }
+
+    const passwordSalt = user.passwordHash.slice(0, 29)
+    const passwordHash = await this._generateHash(password, passwordSalt)
+    
+    if (passwordHash !== user.passwordHash) {
+      return false
+    }
+
+    return true
+  },  
   async _generateHash(password, salt) {
     const hash = await bcrypt.hash(password, salt)
     return hash
