@@ -22,7 +22,7 @@ const middlewares = [
 ]
 
 authRouter
-  .post('/', middlewares, async (req: RequestWithBody<AuthUserModel>, res: Response<ErrorsMessageType>) => {
+  .post('/login', middlewares, async (req: RequestWithBody<AuthUserModel>, res: Response<ErrorsMessageType>) => {
     const checkResult = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
 
     if (!checkResult) {
