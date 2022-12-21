@@ -1,12 +1,12 @@
-import { BlogViewModel, PostViewModel, QueryBlogModel } from '../models'
+import { BlogViewModel, PostViewModel, QueryBlogModel, QueryPostModel } from '../models'
 import { BlogType, PostType } from '../schema'
 import { ResponseViewModelDetail } from '../response'
-import { UpdateBlogService } from '../domain/blogs'
+import { UpdateBlogService } from '../domain'
 
 export type RepositoryBlogType = {
   findAllBlogs: ({ searchNameTerm, pageNumber, pageSize, sortBy, sortDirection }: QueryBlogModel) => Promise<ResponseViewModelDetail<BlogViewModel>>
   findBlogById: (id: string) => Promise<BlogViewModel | null>
-  findPostsByBlogId: (blogId: string, { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection }: QueryBlogModel) => Promise<ResponseViewModelDetail<PostViewModel>>
+  findPostsByBlogId: (blogId: string, { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection }: QueryPostModel) => Promise<ResponseViewModelDetail<PostViewModel>>
   createdBlog: (createdBlog: BlogType) => Promise<BlogViewModel>
   createdPostByBlogId: (createdPost: PostType) => Promise<PostViewModel>
   updateBlog: ({ id, name, description, websiteUrl }: UpdateBlogService) => Promise<boolean>

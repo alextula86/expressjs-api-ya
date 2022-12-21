@@ -1,6 +1,8 @@
-import { Router, Response } from 'express'
-import { userService } from '../domains/user-service'
+import { Router, Response, Request } from 'express'
+import { jwtService } from '../application'
+import { userService } from '../domains'
 import {
+  authBearerMiddleware,
   loginOrEmailUserValidation,
   passwordUserValidation,
   inputValidationMiddleware,
@@ -22,12 +24,19 @@ const middlewares = [
 ]
 
 authRouter
-  .post('/login', middlewares, async (req: RequestWithBody<AuthUserModel>, res: Response<ErrorsMessageType>) => {
-    const checkResult = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
+  .post('/login', middlewares, async (req: RequestWithBody<AuthUserModel>, res: Response<{ token: string } | ErrorsMessageType>) => {
+    const user = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
 
-    if (!checkResult) {
+    if (!user) {
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
-    res.status(HTTPStatuses.NOCONTENT204).send()
+    const token = await jwtService.createJWT(user)
+
+    res.status(HTTPStatuses.SUCCESS200).send(token)
+  })
+  .get('/me', authBearerMiddleware, async (req: Request & any, res: Response) => {
+    const foundUserById = await userService.findUserById(req.user.userId)  
+
+    res.status(HTTPStatuses.SUCCESS200).send(foundUserById)
   })

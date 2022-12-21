@@ -1,7 +1,7 @@
 import { Router, Response } from 'express'
-import { blogService } from '../domains/blog-service'
+import { blogService } from '../domains'
 import {
-  authMiddleware,
+  authBearerMiddleware,
   nameBlogValidation,
   descriptionBlogValidation,
   websiteUrlBlogValidation,
@@ -20,8 +20,9 @@ import {
   URIParamsBlogModel,
   URIParamsPostsByBlogId,
   QueryBlogModel,
+  QueryPostModel,
   CreateBlogModel,
-  CreatePostModelWithoutBlogId,
+  CreatePostForBlogModel,
   UpdateBlogModel,
   BlogViewModel,
   PostViewModel,
@@ -33,7 +34,7 @@ import {
 export const blogsRouter = Router()
 
 const middlewares = [
-  authMiddleware,
+  authBearerMiddleware,
   nameBlogValidation,
   descriptionBlogValidation,
   websiteUrlBlogValidation,
@@ -41,7 +42,7 @@ const middlewares = [
 ]
 
 const middlewaresPost = [
-  authMiddleware,
+  authBearerMiddleware,
   titlePostValidation,
   shortPostDescriptionValidation,
   contentPostValidation,
@@ -69,7 +70,7 @@ blogsRouter
 
     res.status(HTTPStatuses.SUCCESS200).send(blogById)
   })
-  .get('/:blogId/posts', async (req: RequestWithParamsAndQuery<URIParamsPostsByBlogId, QueryBlogModel>, res: Response<ResponseViewModelDetail<PostViewModel>>) => {
+  .get('/:blogId/posts', async (req: RequestWithParamsAndQuery<URIParamsPostsByBlogId, QueryPostModel>, res: Response<ResponseViewModelDetail<PostViewModel>>) => {
     const blogById = await blogService.findBlogById(req.params.blogId)
 
     if (!blogById) {
@@ -95,7 +96,7 @@ blogsRouter
 
     res.status(HTTPStatuses.CREATED201).send(createdBlog)
   })
-  .post('/:blogId/posts', middlewaresPost, async (req: RequestWithParamsAndBody<URIParamsPostsByBlogId, CreatePostModelWithoutBlogId>, res: Response<PostViewModel | ErrorsMessageType>) => {
+  .post('/:blogId/posts', middlewaresPost, async (req: RequestWithParamsAndBody<URIParamsPostsByBlogId, CreatePostForBlogModel>, res: Response<PostViewModel | ErrorsMessageType>) => {
     const blogById = await blogService.findBlogById(req.params.blogId)
 
     if (!blogById) {
@@ -132,7 +133,7 @@ blogsRouter
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .delete('/:id', authMiddleware, async (req: RequestWithParams<URIParamsBlogModel>, res: Response<boolean>) => {
+  .delete('/:id', authBearerMiddleware, async (req: RequestWithParams<URIParamsBlogModel>, res: Response<boolean>) => {
     const isBlogDeleted = await blogService.deleteBlogById(req.params.id)
 
     if (!isBlogDeleted) {

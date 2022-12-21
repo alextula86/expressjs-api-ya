@@ -55,17 +55,17 @@ export const userService: ServiceUserType = {
     const user = await userRepository.findByLoginOrEmail(loginOrEmail)
 
     if (!user) {
-      return false
+      return null
     }
 
     const passwordSalt = user.passwordHash.slice(0, 29)
     const passwordHash = await this._generateHash(password, passwordSalt)
     
     if (passwordHash !== user.passwordHash) {
-      return false
+      return null
     }
 
-    return true
+    return user
   },  
   async _generateHash(password, salt) {
     const hash = await bcrypt.hash(password, salt)

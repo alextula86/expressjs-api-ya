@@ -1,5 +1,5 @@
 import { postCollection } from '../../repositories/db'
-import { RepositoryPostType, PostType, SortDirection } from '../../types'
+import { RepositoryPostType, PostType, CommentType, SortDirection } from '../../types'
 
 export const postRepository: RepositoryPostType = {
   async findAllPosts({

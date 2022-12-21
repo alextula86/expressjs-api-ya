@@ -1,7 +1,7 @@
 
 export type URIParamsPostsByBlogId = {
   /** 
-   * id of existing video
+   * blogId of existing video
   */
-   blogId: string
+  blogId: string
 }

@@ -53,7 +53,7 @@ export const userRepository: RepositoryUserType = {
       return null
     }
 
-    return this._getUserViewModel(foundUser)
+    return this._getUserAuthViewModel(foundUser)
   },
   async createdUser(createdUser) {
     await userCollection.insertOne(createdUser)
@@ -99,4 +99,11 @@ export const userRepository: RepositoryUserType = {
       })),
     }
   },
+  _getUserAuthViewModel(dbUser) {
+    return {
+      userId: dbUser.id,
+      login: dbUser.login,
+      email: dbUser.email,
+    }
+  },  
 }
