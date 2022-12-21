@@ -38,7 +38,7 @@ commentsRouter
     const commentById = await commentService.findCommentById(req.params.id)
 
     if (isEmpty(commentById)) {
-      return res.status(HTTPStatuses.BADREQUEST400).send()
+      return res.status(HTTPStatuses.NOTFOUND404).send()
     }
 
     const isCommentUpdated = await commentService.updateComment({
