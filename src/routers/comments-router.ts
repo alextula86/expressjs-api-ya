@@ -34,11 +34,15 @@ commentsRouter
 
     res.status(HTTPStatuses.SUCCESS200).send(commentById)
   })  
-  .put('/:id', middlewares, async (req: RequestWithParamsAndBody<URIParamsCommentModel, UpdateCommentModel>, res: Response<boolean>) => {
+  .put('/:id', middlewares, async (req: RequestWithParamsAndBody<URIParamsCommentModel, UpdateCommentModel> & any, res: Response<boolean>) => {
     const commentById = await commentService.findCommentById(req.params.id)
 
     if (isEmpty(commentById)) {
       return res.status(HTTPStatuses.NOTFOUND404).send()
+    }
+
+    if (commentById.userId !== req.user!.userId || commentById.userLogin !== req.user!.login) {
+      return res.status(HTTPStatuses.FORBIDDEN403).send()
     }
 
     const isCommentUpdated = await commentService.updateComment({
@@ -52,7 +56,13 @@ commentsRouter
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .delete('/:id', authBearerMiddleware, async (req: RequestWithParams<URIParamsCommentModel>, res: Response<boolean>) => {
+  .delete('/:id', authBearerMiddleware, async (req: RequestWithParams<URIParamsCommentModel> & any, res: Response<boolean>) => {
+    const commentById = await commentService.findCommentById(req.params.id)
+
+    if (!isEmpty(commentById) && (commentById.userId !== req.user!.userId || commentById.userLogin !== req.user!.login)) {
+      return res.status(HTTPStatuses.FORBIDDEN403).send()
+    }
+
     const isCommentDeleted = await commentService.deleteCommentById(req.params.id)
 
     if (!isCommentDeleted) {
