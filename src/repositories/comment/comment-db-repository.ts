@@ -14,7 +14,7 @@ export const commentRepository: RepositoryCommentType = {
     const filter: any = { postId: { $eq: postId } }
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
 
-    const totalCount = await commentCollection.count({})
+    const totalCount = await commentCollection.count(filter)
     const pagesCount = Math.ceil(totalCount / size)
     const skip = (number - 1) * size
 

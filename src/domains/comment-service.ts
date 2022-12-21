@@ -9,7 +9,7 @@ export const commentService: ServiceCommentType = {
     pageNumber,
     pageSize,
     sortBy = 'createdAt',
-    sortDirection =  SortDirection.DESC,
+    sortDirection = SortDirection.DESC,
   }) {
     const foundAllComments = await commentRepository.findAllCommentsByPostId(postId, {
       pageNumber,
