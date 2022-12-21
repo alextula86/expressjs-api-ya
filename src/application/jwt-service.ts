@@ -6,7 +6,7 @@ export const jwtService = {
   async createJWT (user: UserViewModel) {
     const token = jwt.sign({ userId: user.id }, settings.JWT_SECRET, { expiresIn: '7d' })
 
-    return { token }
+    return { accessToken: token }
   }, 
   async getUserIdByToken (token: string) {
     try {
