@@ -3,6 +3,7 @@ import { isEmpty } from 'lodash'
 import { blogService, postService, commentService } from '../domains'
 
 import {
+  authBasicMiddleware,
   authBearerMiddleware,
   titlePostValidation,
   shortPostDescriptionValidation,
@@ -35,7 +36,7 @@ import {
 export const postsRouter = Router()
 
 const middlewares = [
-  authBearerMiddleware,
+  authBasicMiddleware,
   titlePostValidation,
   shortPostDescriptionValidation,
   contentPostValidation,
@@ -141,7 +142,7 @@ postsRouter
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .delete('/:id', authBearerMiddleware, async (req: RequestWithParams<URIParamsPostModel>, res: Response<boolean>) => {
+  .delete('/:id', authBasicMiddleware, async (req: RequestWithParams<URIParamsPostModel>, res: Response<boolean>) => {
     const isPostDeleted = await postService.deletePostById(req.params.id)
 
     if (!isPostDeleted) {

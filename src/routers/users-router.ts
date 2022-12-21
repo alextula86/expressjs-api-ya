@@ -1,7 +1,7 @@
 import { Router, Response } from 'express'
 import { userService } from '../domains'
 import {
-  authBearerMiddleware,
+  authBasicMiddleware,
   loginUserValidation,
   emailUserValidation,
   passwordUserValidation,
@@ -24,7 +24,7 @@ import {
 export const usersRouter = Router()
 
 const middlewares = [
-  authBearerMiddleware,
+  authBasicMiddleware,
   loginUserValidation,
   emailUserValidation,
   passwordUserValidation,
@@ -32,7 +32,7 @@ const middlewares = [
 ]
 
 usersRouter
-  .get('/', authBearerMiddleware, async (req: RequestWithQuery<QueryUserModel>, res: Response<ResponseViewModelDetail<UserViewModel>>) => {
+  .get('/', authBasicMiddleware, async (req: RequestWithQuery<QueryUserModel>, res: Response<ResponseViewModelDetail<UserViewModel>>) => {
     const allUsers = await userService.findAllUsers({
       searchLoginTerm: req.query.searchLoginTerm,
       searchEmailTerm: req.query.searchEmailTerm,
@@ -53,7 +53,7 @@ usersRouter
 
     res.status(HTTPStatuses.CREATED201).send(createdUser)
   })
-  .delete('/:id', authBearerMiddleware, async (req: RequestWithParams<URIParamsUserModel>, res: Response<boolean>) => {
+  .delete('/:id', authBasicMiddleware, async (req: RequestWithParams<URIParamsUserModel>, res: Response<boolean>) => {
     const isUserDeleted = await userService.deleteUserById(req.params.id)
 
     if (!isUserDeleted) {
