@@ -18,11 +18,11 @@ export const userRepository: RepositoryUserType = {
     const sort: any = { [sortBy]: sortDirection === SortDirection.ASC ? 1 : -1 }
 
     if (searchLoginTerm) {
-      query.push({ login: { $regex: searchLoginTerm, $options: 'i' } })
+      query.push({ 'accountData.login': { $regex: searchLoginTerm, $options: 'i' } })
     }
 
     if (searchEmailTerm) {
-      query.push({ email: { $regex: searchEmailTerm, $options: 'i' } })
+      query.push({ 'accountData.email': { $regex: searchEmailTerm, $options: 'i' } })
     }
 
     const filter = !isEmpty(query) ? { $or: query } : {}
@@ -55,6 +55,24 @@ export const userRepository: RepositoryUserType = {
 
     return this._getUserAuthViewModel(foundUser)
   },
+  async findByLoginOrEmail(loginOrEmail: string) {
+    const foundUser: UserType | null = await userCollection.findOne({ $or: [{ 'accountData.login': loginOrEmail }, { 'accountData.email': loginOrEmail }] })
+
+    if (!foundUser) {
+      return null
+    }
+
+    return foundUser
+  },
+  async findByConfirmationCode(code) {
+    const foundUser: UserType | null = await userCollection.findOne({ 'emailConfirmation.confirmationCode': code })
+
+    if (!foundUser) {
+      return null
+    }
+
+    return foundUser
+  },
   async createdUser(createdUser) {
     await userCollection.insertOne(createdUser)
 
@@ -65,23 +83,21 @@ export const userRepository: RepositoryUserType = {
 
     return deletedCount === 1
   },
-  async findByLoginOrEmail(loginOrEmail: string) {
-    const foundUser: UserType | null = await userCollection.findOne({ $or: [{ login: loginOrEmail }, { email: loginOrEmail }] })
+  async updateConfirmationByCode(code) {
+    const result = await userCollection.updateOne({ 'emailConfirmation.confirmationCode': code }, {
+      $set: {
+        'emailConfirmation.isConfirmed': true
+      }
+    })
 
-    if (!foundUser) {
-      return null
-    }
-
-    return foundUser
+    return result.modifiedCount === 1
   },
-  
   _getUserViewModel(dbUser) {
     return {
       id: dbUser.id,
-      login: dbUser.login,
-      email: dbUser.email,
-      // passwordHash: dbUser.passwordHash,
-      createdAt: dbUser.createdAt,
+      login: dbUser.accountData.login,
+      email: dbUser.accountData.email,
+      createdAt: dbUser.accountData.createdAt,
     }
   },
   _getUsersViewModelDetail({ items, totalCount, pagesCount, page, pageSize }) {
@@ -92,18 +108,17 @@ export const userRepository: RepositoryUserType = {
       totalCount,
       items: items.map(item => ({
         id: item.id,
-        login: item.login,
-        email: item.email,
-        // passwordHash: item.passwordHash,
-        createdAt: item.createdAt,
+        login: item.accountData.login,
+        email: item.accountData.email,
+        createdAt: item.accountData.createdAt,
       })),
     }
   },
   _getUserAuthViewModel(dbUser) {
     return {
       userId: dbUser.id,
-      login: dbUser.login,
-      email: dbUser.email,
+      login: dbUser.accountData.login,
+      email: dbUser.accountData.email,
     }
   },  
 }

@@ -1,9 +1,8 @@
 import { trim } from 'lodash'
 import bcrypt from 'bcrypt'
 import { userRepository } from '../repositories/user/user-db-repository'
-import { getNextStrId } from '../utils'
-import { UserType, SortDirection } from '../types'
-import { ServiceUserType } from '../types/domain/users'
+import { getNextStrId, getConfirmationCode } from '../utils'
+import { UserType, SortDirection, ServiceUserType } from '../types'
 
 export const userService: ServiceUserType = {
   async findAllUsers({
@@ -14,7 +13,7 @@ export const userService: ServiceUserType = {
     sortBy = 'createdAt',
     sortDirection =  SortDirection.DESC,
   }) {
-    const foundAllPosts = await userRepository.findAllUsers({
+    const foundAllUsers = await userRepository.findAllUsers({
       searchLoginTerm,
       searchEmailTerm,
       pageNumber,
@@ -23,7 +22,7 @@ export const userService: ServiceUserType = {
       sortDirection,
     })
 
-    return foundAllPosts
+    return foundAllUsers
   },
   async findUserById(id) {
     const foundUserById = await userRepository.findUserById(id)
@@ -36,10 +35,17 @@ export const userService: ServiceUserType = {
     
     const newUser: UserType = {
       id: getNextStrId(),
-      login: trim(String(login)),
-      email: trim(String(email)),
-      passwordHash,
-      createdAt: new Date().toISOString(),
+      accountData: {
+        login: trim(String(login)),
+        email: trim(String(email)),
+        passwordHash,
+        createdAt: new Date().toISOString(),
+      },
+      emailConfirmation: {
+        confirmationCode: getConfirmationCode(),
+        expirationDate: new Date(),
+        isConfirmed: true,
+      },
     }
 
     const createdUser = await userRepository.createdUser(newUser)
@@ -58,10 +64,10 @@ export const userService: ServiceUserType = {
       return null
     }
 
-    const passwordSalt = user.passwordHash.slice(0, 29)
+    const passwordSalt = user.accountData.passwordHash.slice(0, 29)
     const passwordHash = await this._generateHash(password, passwordSalt)
-    
-    if (passwordHash !== user.passwordHash) {
+
+    if (passwordHash !== user.accountData.passwordHash) {
       return null
     }
 

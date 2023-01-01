@@ -1,4 +1,6 @@
 export * from './blogs'
 export * from './posts'
 export * from './comments'
+export * from './auth'
 export * from './users'
+export * from './email'

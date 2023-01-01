@@ -1,6 +1,6 @@
 import { PostViewModel, QueryPostModel } from '../../models'
+import { UpdatePostService, CreaetPostService } from '../../service'
 import { ResponseViewModelDetail } from '../../response'
-import { UpdatePostService, CreaetPostService } from '../../domain'
 
 export type ServicePostType = {
   findAllPosts: ({ searchNameTerm, pageNumber, pageSize, sortBy, sortDirection}: QueryPostModel) => Promise<ResponseViewModelDetail<PostViewModel>>

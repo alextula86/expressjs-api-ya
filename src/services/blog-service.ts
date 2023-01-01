@@ -1,8 +1,7 @@
 import { trim } from 'lodash'
 import { blogRepository } from '../repositories/blog/blog-db-repository'
 import { getNextStrId } from '../utils'
-import { BlogType, PostType, SortDirection } from '../types'
-import { ServiceBlogType } from '../types/domain/blogs'
+import { BlogType, PostType, SortDirection, ServiceBlogType } from '../types'
 
 export const blogService: ServiceBlogType = {
   async findAllBlogs({

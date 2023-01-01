@@ -1,6 +1,6 @@
 import { Router, Response } from 'express'
 import { isEmpty } from 'lodash'
-import { blogService, postService, commentService } from '../domains'
+import { blogService, postService, commentService } from '../services'
 
 import {
   authBasicMiddleware,

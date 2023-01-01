@@ -1,6 +1,6 @@
 import { QueryCommentModel, CommentViewModel } from '../../models'
 import { ResponseViewModelDetail } from '../../response'
-import { CreateCommentService, UpdateCommentService } from '../../domain'
+import { CreateCommentService, UpdateCommentService } from '../../service'
 
 export type ServiceCommentType = {
   findAllCommentsByPostId: (postId: string, { pageNumber, pageSize, sortBy, sortDirection }: QueryCommentModel) => Promise<ResponseViewModelDetail<CommentViewModel>>

@@ -1,5 +1,5 @@
 import { Router, Response } from 'express'
-import { userService } from '../domains'
+import { userService } from '../services'
 import {
   authBasicMiddleware,
   loginUserValidation,

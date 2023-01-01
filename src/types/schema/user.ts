@@ -1,4 +1,4 @@
-export type UserType = {
+export type UserOldType = {
   /** 
   * id of existing user
   * login of existing user
@@ -12,4 +12,23 @@ export type UserType = {
   passwordHash: string
   // passwordSalt: string
   createdAt: string
+}
+
+type UserDataType = {
+  login: string
+  email: string
+  passwordHash: string
+  createdAt: string
+}
+
+type EmailConfirmationType = {
+  confirmationCode: string
+  expirationDate: Date
+  isConfirmed: boolean
+}
+
+export type UserType = {
+  id: string
+  accountData: UserDataType
+  emailConfirmation: EmailConfirmationType
 }

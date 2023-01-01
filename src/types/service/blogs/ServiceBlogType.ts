@@ -1,6 +1,6 @@
 import { BlogViewModel, PostViewModel, QueryBlogModel, QueryPostModel } from '../../models'
+import { CreaetBlogService, UpdateBlogService, CreaetPostService } from '../../service'
 import { ResponseViewModelDetail } from '../../response'
-import { CreaetBlogService, UpdateBlogService, CreaetPostService } from '../../domain'
 
 export type ServiceBlogType = {
   findAllBlogs: ({ searchNameTerm, pageNumber, pageSize, sortBy, sortDirection }: QueryBlogModel) => Promise<ResponseViewModelDetail<BlogViewModel>>

@@ -1,8 +1,7 @@
 import { trim } from 'lodash'
 import { postRepository } from '../repositories/post/post-db-repository'
 import { getNextStrId } from '../utils'
-import { PostType, SortDirection } from '../types'
-import { ServicePostType } from '../types/domain/posts'
+import { PostType, SortDirection, ServicePostType } from '../types'
 
 export const postService: ServicePostType = {
   async findAllPosts({
@@ -43,7 +42,7 @@ export const postService: ServicePostType = {
     return createdPost
   },
   async updatePost({ id, title, shortDescription, content, blogId, blogName }) {
-    const updatedPost = {
+    const updatedPost: PostType = {
       id,
       title: trim(String(title)),
       shortDescription: trim(String(shortDescription)),

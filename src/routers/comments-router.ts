@@ -1,6 +1,6 @@
 import { Router, Response } from 'express'
 import { isEmpty } from 'lodash'
-import { commentService } from '../domains'
+import { commentService } from '../services'
 import {
   authBearerMiddleware,
   contentCommentValidation,

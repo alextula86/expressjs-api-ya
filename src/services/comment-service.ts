@@ -1,8 +1,7 @@
 import { trim } from 'lodash'
-import { getNextStrId } from '../utils'
-import { CommentType, SortDirection } from '../types'
 import { commentRepository } from '../repositories/comment/comment-db-repository'
-import { ServiceCommentType } from '../types/domain/comments'
+import { getNextStrId } from '../utils'
+import { CommentType, SortDirection, ServiceCommentType } from '../types'
 
 export const commentService: ServiceCommentType = {
   async findAllCommentsByPostId(postId: string, {

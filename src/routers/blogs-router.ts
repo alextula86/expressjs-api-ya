@@ -1,5 +1,5 @@
 import { Router, Response } from 'express'
-import { blogService } from '../domains'
+import { blogService } from '../services'
 import {
   authBasicMiddleware,
   nameBlogValidation,
