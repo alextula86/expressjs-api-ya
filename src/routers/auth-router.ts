@@ -7,6 +7,7 @@ import {
   passwordUserValidation,
   loginUserValidation,
   emailUserValidation,
+  codeUserValidation,
   inputValidationMiddleware,
 } from '../middlewares'
 
@@ -68,7 +69,7 @@ authRouter
 
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .post('/registration-confirmation', async (req: RequestWithBody<RegistrationConfirmationModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
+  .post('/registration-confirmation', codeUserValidation, async (req: RequestWithBody<RegistrationConfirmationModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
     const isConfirmed = await authService.confirmEmail(req.body.code)
     
     if (!isConfirmed) {
@@ -77,7 +78,7 @@ authRouter
     
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  .post('/registration-email-resending', async (req: RequestWithBody<RegistrationEmailResendingModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
+  .post('/registration-email-resending', emailUserValidation, async (req: RequestWithBody<RegistrationEmailResendingModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
     const isResending = await authService.resendingCode(req.body.email) 
     
     if (!isResending) {

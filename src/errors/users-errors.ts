@@ -13,4 +13,9 @@ export const usersErrorsValidator = {
     message: "password is incorrectly",
     field: "password"
   },
+
+  codeError: {
+    message: "code is incorrectly",
+    field: "code"
+  },
 }
