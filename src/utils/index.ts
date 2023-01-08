@@ -1,2 +1,2 @@
 export * from './getNextId'
-export * from './getConfirmationCode'
+export * from './generateConfirmationCode'

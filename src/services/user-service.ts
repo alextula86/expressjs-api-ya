@@ -1,7 +1,7 @@
 import { trim } from 'lodash'
 import bcrypt from 'bcrypt'
 import { userRepository } from '../repositories/user/user-db-repository'
-import { getNextStrId, getConfirmationCode } from '../utils'
+import { getNextStrId, generateConfirmationCode } from '../utils'
 import { UserType, SortDirection, ServiceUserType } from '../types'
 
 export const userService: ServiceUserType = {
@@ -42,7 +42,7 @@ export const userService: ServiceUserType = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: getConfirmationCode(),
+        confirmationCode: generateConfirmationCode(),
         expirationDate: new Date(),
         isConfirmed: true,
       },

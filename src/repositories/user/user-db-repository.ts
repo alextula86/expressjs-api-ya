@@ -92,6 +92,15 @@ export const userRepository: RepositoryUserType = {
 
     return result.modifiedCount === 1
   },
+  async updateConfirmationCodeByEmail(email, code) {
+    const result = await userCollection.updateOne({ 'accountData.email': email }, {
+      $set: {
+        'emailConfirmation.confirmationCode': code
+      }
+    })
+
+    return result.modifiedCount === 1
+  },
   _getUserViewModel(dbUser) {
     return {
       id: dbUser.id,

@@ -10,6 +10,7 @@ export type RepositoryUserType = {
   createdUser: (dbUser: UserType) => Promise<UserViewModel>
   deleteUserById: (id: string) => Promise<boolean>
   updateConfirmationByCode: (code: string) => Promise<boolean>
+  updateConfirmationCodeByEmail: (email: string, code: string) => Promise<boolean>
   _getUserViewModel: (dbUser: UserType) => UserViewModel
   _getUsersViewModelDetail: ({ items, totalCount, pagesCount, page, pageSize }: ResponseViewModelDetail<UserType>) => ResponseViewModelDetail<UserViewModel>
   _getUserAuthViewModel: (dbUser: UserType) => UserAuthViewModel

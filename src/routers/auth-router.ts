@@ -46,7 +46,6 @@ authRouter
     // Если пользователь найден возвращаем статус 200 и найденного пользователя
     res.status(HTTPStatuses.SUCCESS200).send(foundUserById)
   })
-
   // Аутентификация пользователя
   .post('/login', middlewaresLogin, async (req: RequestWithBody<AuthUserModel>, res: Response<AuthAccessTokenModel | ErrorsMessageType>) => {
     // Проверяем правильность ввода логина/email и пароля
@@ -63,7 +62,6 @@ authRouter
     // Возвращаем статус 200 и сформированный токен
     res.status(HTTPStatuses.SUCCESS200).send(token)
   })
-
   // Регистрация пользователя
   .post('/registration', middlewaresRegistration, async (req: RequestWithBody<CreateUserModel>, res: Response<any | ErrorsMessageType>) => {
     // Проверяем существует ли пользователь по логину
@@ -97,23 +95,31 @@ authRouter
     // В случае отправки email с кодом и создания пользователя возвращаем статус 204
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-
+  // Подтверждение email по коду
   .post('/registration-confirmation', codeUserValidation, async (req: RequestWithBody<RegistrationConfirmationModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
+    // Отправляем код подтверждения email
     const isConfirmed = await authService.confirmEmail(req.body.code)
-    
+
+    // Если код подтверждения email не отправлен, возвращаем статус 400
     if (!isConfirmed) {
       return res.status(HTTPStatuses.BADREQUEST400).send()
     }
-    
+
+    // Если код подтверждения email отправлен успешно, возвращаем статус 204
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
+  // Повторная отправка кода подтверждения email
   .post('/registration-email-resending', emailUserValidation, async (req: RequestWithBody<RegistrationEmailResendingModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
-    const isResending = await authService.resendingCode(req.body.email) 
-    
+    // Повторно формируем код подтверждения email, обновляем код у пользователя и отправляем письмо
+    const isResending = await authService.resendingCode(req.body.email)
+
+    // Если новый код подтверждения email не сформирован или не сохранен для пользователя или письмо не отправлено,
+    // возвращаем статус 400
     if (!isResending) {
       return res.status(HTTPStatuses.BADREQUEST400).send()
     }
-    
+
+    // Если новый код подтверждения email сформирован, сохранен для пользователя и письмо отправлено,
+    // возвращаем статус 204
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
-  
