@@ -13,7 +13,7 @@ export const existsUserByEmail = async (req: RequestWithBody<EmailAuthService>, 
   // Если email уже подтвержден
   // Возвращаем статус 400 и сообщение об ошибке
   if (!user || user.emailConfirmation.expirationDate < new Date() || user.emailConfirmation.isConfirmed) {
-    return res.status(400).send({ errorsMessages: [usersErrorsValidator.emailError]})
+    return res.status(400).send({ errorsMessages: [usersErrorsValidator.emailError] })
   }
 
   next()
