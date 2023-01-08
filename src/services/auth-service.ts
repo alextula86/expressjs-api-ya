@@ -50,24 +50,6 @@ export const authService: ServiceAuthType = {
   },
   // Подтверждение email по коду
   async confirmEmail(code) {
-    // Ищем пользователя по коду
-    const user = await userRepository.findByConfirmationCode(code)
-
-    // Если пользователь по коду не найден, останавливаем выполнение
-    if (!user) {
-      return false
-    }
-
-    // Если дата для подтверждения email по коду просрочена, останавливаем выполнение
-    if (user.emailConfirmation.expirationDate < new Date()) {
-      return false
-    }
-
-    // Если email уже подтвержден, останавливаем выполнение
-    if (user.emailConfirmation.isConfirmed) {
-      return false
-    }
-
     // Обновляем признак подтвержения по коду подтверждения
     const isConfirmed = await userRepository.updateConfirmationByCode(code)
 
@@ -76,23 +58,6 @@ export const authService: ServiceAuthType = {
   },
   // Повторная отправка кода подтверждения email
   async resendingCode(email) {
-    // Ищем пользователя по email
-    const user = await userRepository.findByLoginOrEmail(email)
-    // Если пользователь по email не найден, останавливаем выполнение
-    if (!user) {
-      return false
-    }
-
-    // Если дата для подтверждения email по коду просрочена, останавливаем выполнение
-    if (user.emailConfirmation.expirationDate < new Date()) {
-      return false
-    }
-
-    // Если email уже подтвержден, останавливаем выполнение
-    if (user.emailConfirmation.isConfirmed) {
-      return false
-    }
-
     // Генерируем код для подтверждения email
     const confirmationCode = generateConfirmationCode()
 
@@ -128,25 +93,35 @@ export const authService: ServiceAuthType = {
 
     return user
   },
-  // Проверяем существует ли пользователь по логину и email
-  async checkExistsUser(loginOrEmail) {
+  // Проверяем существует ли пользователь по логину
+  async checkExistsUserByLoginOrEmail(loginOrEmail) {
     const user = await userRepository.findByLoginOrEmail(loginOrEmail)
 
-    if (user) {
-      return true
+    if (!user) {
+      return null
     }
 
-    return false
+    return user
   },
-  // Проверяем существует ли confirmationCode
+  // Проверяем существует ли пользователь по email
+  async checkExistsUserByEmail(email) {
+    const user = await userRepository.findByLoginOrEmail(email)
+
+    if (!user) {
+      return null
+    }
+
+    return user
+  },
+  // Проверяем существует ли пользователь по коду подтверждения email
   async checkExistsConfirmationCode(confirmationCode) {
     const user = await userRepository.findByConfirmationCode(confirmationCode)
 
-    if (user) {
-      return true
+    if (!user) {
+      return null
     }
 
-    return false
+    return user
   },
 
   // Формируем hash из пароля и его соли

@@ -73,15 +73,6 @@ export const userService: ServiceUserType = {
 
     return user
   },
-  async checkExistsUser(loginOrEmail) {
-    const user = await userRepository.findByLoginOrEmail(loginOrEmail)
-
-    if (user) {
-      return true
-    }
-
-    return false
-  },
   async _generateHash(password, salt) {
     const hash = await bcrypt.hash(password, salt)
     return hash

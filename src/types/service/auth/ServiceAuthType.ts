@@ -7,7 +7,8 @@ export type ServiceAuthType = {
   confirmEmail: (code: string) => Promise<boolean>
   resendingCode: (email: string) => Promise<boolean>
   checkCredentials: (loginOrEmail: string, password: string) => Promise<UserType | null>
-  checkExistsUser: (loginOrEmail: string) => Promise<boolean>
-  checkExistsConfirmationCode: (confirmationCode: string) => Promise<boolean>
+  checkExistsUserByLoginOrEmail: (loginOrEmail: string) => Promise<UserType | null>
+  checkExistsUserByEmail: (email: string) => Promise<UserType | null>
+  checkExistsConfirmationCode: (confirmationCode: string) => Promise<UserType | null>
   _generateHash: (password: string, salt: string) => Promise<string>
 }
