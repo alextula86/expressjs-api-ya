@@ -18,7 +18,6 @@ import {
   CreateUserModel,
   RegistrationConfirmationModel,
   RegistrationEmailResendingModel,
-
   UserViewModel,
   HTTPStatuses,
   ErrorsMessageType,
@@ -40,35 +39,65 @@ const middlewaresRegistration = [
 ]
 
 authRouter
+  // Получение данных о пользователе
   .get('/me', authBearerMiddleware, async (req: Request & any, res: Response) => {
-    const foundUserById = await userService.findUserById(req.user.userId)  
-
+    // Ищем пользователя по идентификатору, если пользователь не найден то Middleware вернет статус 401
+    const foundUserById = await userService.findUserById(req.user.userId)
+    // Если пользователь найден возвращаем статус 200 и найденного пользователя
     res.status(HTTPStatuses.SUCCESS200).send(foundUserById)
   })
-  .post('/login', middlewaresLogin, async (req: RequestWithBody<AuthUserModel>, res: Response<AuthAccessTokenModel | ErrorsMessageType>) => {
-    const user = await userService.checkCredentials(req.body.loginOrEmail, req.body.password)
 
+  // Аутентификация пользователя
+  .post('/login', middlewaresLogin, async (req: RequestWithBody<AuthUserModel>, res: Response<AuthAccessTokenModel | ErrorsMessageType>) => {
+    // Проверяем правильность ввода логина/email и пароля
+    const user = await authService.checkCredentials(req.body.loginOrEmail, req.body.password)
+
+    // Если логин/email и пароль введен неверно, возвращаем статус 401
     if (!user) {
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
+    // Формируем jwt токен
     const token = await jwtService.createJWT(user)
 
+    // Возвращаем статус 200 и сформированный токен
     res.status(HTTPStatuses.SUCCESS200).send(token)
   })
+
+  // Регистрация пользователя
   .post('/registration', middlewaresRegistration, async (req: RequestWithBody<CreateUserModel>, res: Response<any | ErrorsMessageType>) => {
+    // Проверяем существует ли пользователь по логину
+    const isExistsUserByLogin = await authService.checkExistsUser(req.body.login)
+
+    // Если пользователь с переданным логином существует, возвращаем статус 400 и сообщение с ошибкой
+    if (isExistsUserByLogin) {
+      return res.status(HTTPStatuses.BADREQUEST400).send({errorsMessages: [{ message: 'login is incorrectly', field: 'login' }]})
+    }
+
+    // Проверяем существует ли пользователь по email
+    const isExistsUserByEmail = await authService.checkExistsUser(req.body.email)
+
+    // Если пользователь с переданным email существует, возвращаем статус 400 и сообщение с ошибкой
+    if (isExistsUserByEmail) {
+      return res.status(HTTPStatuses.BADREQUEST400).send({errorsMessages: [{ message: 'email is incorrectly', field: 'email' }]})
+    }
+
+    // Добавляем пользователя и отправляем письмо с кодом для подтверждения регистрации
     const user = await authService.registerUser({
       login: req.body.login,
       password: req.body.password,
       email: req.body.email,
     })
 
+    // Если по каким-либо причинам email с кодом не отправлен и пользователь не создался возвращаем статус 400
     if (!user) {
       return res.status(HTTPStatuses.BADREQUEST400).send()
     }
 
+    // В случае отправки email с кодом и создания пользователя возвращаем статус 204
     res.status(HTTPStatuses.NOCONTENT204).send()
   })
+
   .post('/registration-confirmation', codeUserValidation, async (req: RequestWithBody<RegistrationConfirmationModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
     const isConfirmed = await authService.confirmEmail(req.body.code)
     

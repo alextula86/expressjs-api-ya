@@ -9,5 +9,6 @@ export type ServiceUserType = {
   createdUser: ({ login, password, email }: CreaetUserService) => Promise<UserViewModel>
   deleteUserById: (id: string) => Promise<boolean>
   checkCredentials: (loginOrEmail: string, password: string) => Promise<UserType | null>
+  checkExistsUser: (loginOrEmail: string) => Promise<boolean>
   _generateHash: (password: string, salt: string) => Promise<string>
 }

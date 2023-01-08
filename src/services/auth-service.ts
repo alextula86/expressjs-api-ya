@@ -97,7 +97,31 @@ export const authService: ServiceAuthType = {
     }
 
     return user
-  },  
+  },
+
+  // Проверяем существует ли пользователь по логину и email
+  async checkExistsUser(loginOrEmail) {
+    const user = await userRepository.findByLoginOrEmail(loginOrEmail)
+
+    if (user) {
+      return true
+    }
+
+    return false
+  },
+
+  // Проверяем существует ли confirmationCode
+  async checkExistsConfirmationCode(confirmationCode) {
+    const user = await userRepository.findByConfirmationCode(confirmationCode)
+
+    if (user) {
+      return true
+    }
+
+    return false
+  },
+
+  // Формируем hash из пароля и его соли
   async _generateHash(password, salt) {
     const hash = await bcrypt.hash(password, salt)
     return hash
