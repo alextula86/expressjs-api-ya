@@ -48,6 +48,22 @@ export const authService: ServiceAuthType = {
       return null
     }
   },
+  async checkCredentials(loginOrEmail, password) {
+    const user = await userRepository.findByLoginOrEmail(loginOrEmail)
+
+    if (!user) {
+      return null
+    }
+
+    const passwordSalt = user.accountData.passwordHash.slice(0, 29)
+    const passwordHash = await this._generateHash(password, passwordSalt)
+
+    if (passwordHash !== user.accountData.passwordHash) {
+      return null
+    }
+
+    return user
+  },
   // Подтверждение email по коду
   async confirmEmail(code) {
     // Обновляем признак подтвержения по коду подтверждения
@@ -76,22 +92,6 @@ export const authService: ServiceAuthType = {
       // Возвращаем false
       return false
     }
-  },
-  async checkCredentials(loginOrEmail, password) {
-    const user = await userRepository.findByLoginOrEmail(loginOrEmail)
-
-    if (!user) {
-      return null
-    }
-
-    const passwordSalt = user.accountData.passwordHash.slice(0, 29)
-    const passwordHash = await this._generateHash(password, passwordSalt)
-
-    if (passwordHash !== user.accountData.passwordHash) {
-      return null
-    }
-
-    return user
   },
   // Проверяем существует ли пользователь по логину
   async checkExistsUserByLoginOrEmail(loginOrEmail) {

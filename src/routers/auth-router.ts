@@ -70,12 +70,82 @@ authRouter
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
-    // Формируем jwt токен
-    const token = await jwtService.createJWT(user)
+    // Формируем access токен
+    const accessToken = await jwtService.createAccessToken(user.id)
+    // Формируем refresh токен
+    const refreshToken = await jwtService.createRefreshToken(user.id)
 
-    // Возвращаем статус 200 и сформированный токен
-    res.status(HTTPStatuses.SUCCESS200).send(token)
+    // Пишем refresh токен в cookie
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
+
+    // Возвращаем статус 200 и сформированный access токен
+    res.status(HTTPStatuses.SUCCESS200).send(accessToken)
   })
+  .post('/refresh-token', async (req: Request, res: Response) => {
+    const token = req.cookies.refreshToken
+
+    // Если refreshToken не передан, возвращаем статус 401
+    if (!token) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    // Получаем идентификатор пользователя из refreshToken
+    const userId = await jwtService.getUserIdByRefreshToken(token)
+
+    // Если идентификатор пользователя не определен, возвращаем статус 401
+    if (!userId) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    // Получаем пользователя по его идентификатору
+    const user = await userService.findUserById(userId)
+
+    // Если пользователь не найден, возвращаем статус 401
+    if (!user) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    // Формируем новый access токен
+    const accessToken = await jwtService.createAccessToken(user.userId)
+    // Формируем новый refresh токен
+    const refreshToken = await jwtService.createRefreshToken(user.userId)
+
+    // Пишем новый refresh токен в cookie
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
+
+    // Возвращаем статус 200 и сформированный новый access токен
+    res.status(HTTPStatuses.SUCCESS200).send(accessToken)
+  })
+  .post('/logout', async (req: Request, res: Response) => {
+    const token = req.cookies.refreshToken
+
+    // Если refreshToken не передан, возвращаем статус 401
+    if (!token) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    // Получаем идентификатор пользователя из refreshToken
+    const userId = await jwtService.getUserIdByRefreshToken(token)
+
+    // Если идентификатор пользователя не определен, возвращаем статус 401
+    if (!userId) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    // Получаем пользователя по его идентификатору
+    const user = await userService.findUserById(userId)
+
+    // Если пользователь не найден, возвращаем статус 401
+    if (!user) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    // Удаляем refresh токен
+    res.clearCookie('refreshToken')
+
+    // Возвращаем статус 204
+    res.status(HTTPStatuses.NOCONTENT204).send()
+  })  
   // Регистрация пользователя
   .post('/registration', middlewaresRegistration, async (req: RequestWithBody<CreateUserModel>, res: Response<UserViewModel | ErrorsMessageType>) => {
     // Добавляем пользователя и отправляем письмо с кодом для подтверждения регистрации
