@@ -85,8 +85,6 @@ authRouter
       return res.status(401).send()
     }
 
-    res.status(200).send(`req.cookies = ${req?.cookies}, req.headers.cookie = ${JSON.stringify(req.headers?.cookie)}`)
-
     // Верифицируем refresh токен и получаем идентификатор пользователя
     const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
 
@@ -102,7 +100,7 @@ authRouter
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 
     // Возвращаем статус 200 и сформированный новый access токен
-    res.status(HTTPStatuses.SUCCESS200).send({ accessToken })*/
+    res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/logout', async (req: Request, res: Response) => {
     if (!req?.cookies?.refreshToken) {
