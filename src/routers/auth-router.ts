@@ -82,7 +82,9 @@ authRouter
   })
   .post('/refresh-token', async (req: Request, res: Response) => {
     if (!req?.cookies?.refreshToken) {
-      return res.status(401).send(`req.cookies = ${req.cookies}, req.headers = ${JSON.stringify(req.headers.cookie)}`)
+      return res.status(401).send(`req.cookies = ${req?.cookies}, req.headers = ${JSON.stringify(req.headers?.cookie)}`)
+    } else {
+      res.status(200).send(`req.cookies = ${req?.cookies}, req.headers = ${JSON.stringify(req.headers?.cookie)}`)
     }
 
     // Верифицируем refresh токен и получаем идентификатор пользователя
