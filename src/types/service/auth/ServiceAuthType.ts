@@ -12,6 +12,6 @@ export type ServiceAuthType = {
   checkExistsUserByEmail: (email: string) => Promise<UserType | null>
   checkExistsConfirmationCode: (confirmationCode: string) => Promise<UserType | null>
   createUserAuthTokens: (userId: string) => Promise<{ accessToken: string, refreshToken: string }>
-  deleteRefreshTokenByUserId: (userId: string) => Promise<boolean>
+  updateRefreshTokenByUserId: (userId: string, refreshToken: string) => Promise<boolean>
   _generateHash: (password: string, salt: string) => Promise<string>
 }

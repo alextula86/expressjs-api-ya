@@ -74,6 +74,13 @@ authRouter
     const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id)
     console.log('accessToken', accessToken)
     console.log('refreshToken', refreshToken)
+
+    await authService.updateRefreshTokenByUserId(user.id, refreshToken)
+
+    const user1 = await userService.findUserById(user.id)
+
+    console.log('login user1', user1)
+
     // Пишем refresh токен в cookie
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 
@@ -81,12 +88,20 @@ authRouter
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/refresh-token', async (req: Request, res: Response) => {
+    // res.cookie('refreshToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxNjczMjEyNjI4OTQxIiwiaWF0IjoxNjczNDY5NTkxLCJleHAiOjE2NzM1NDE1OTF9.f-idajYl2IEDOBYJGlRp4Eqsp79XQjWLCnhROP5XGeg');
+
     if (!req.cookies.refreshToken) {
+      //console.log('попадаю ли сюда???')
+      //console.log('!req.cookies.refreshToken = ', !req.cookies.refreshToken)
       return res.status(401).send()
     }
 
+    //console.log('req.cookies.refreshToken', req.cookies.refreshToken)
+
     // Верифицируем refresh токен и получаем идентификатор пользователя
     const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
+
+    //console.log('userId', userId)
 
     // Если идентификатор пользователя не определен, возвращаем статус 401
     if (!userId) {
@@ -116,7 +131,7 @@ authRouter
     }
 
     // Удаляем refresh токен
-    await authService.deleteRefreshTokenByUserId(userId)
+    await authService.updateRefreshTokenByUserId(userId, '')
 
     // Удаляем refresh токен из cookie
     res.clearCookie('refreshToken')

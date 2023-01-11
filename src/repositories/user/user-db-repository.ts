@@ -53,6 +53,8 @@ export const userRepository: RepositoryUserType = {
       return null
     }
 
+    console.log('findUserById foundUser', foundUser)
+
     return this._getUserAuthViewModel(foundUser)
   },
   async findRefreshTokenByUserId(userId) {
@@ -110,10 +112,10 @@ export const userRepository: RepositoryUserType = {
 
     return result.modifiedCount === 1
   },
-  async deleteRefreshTokenByUserId(userId) {
+  async updateRefreshTokenByUserId(userId, refreshToken) {
     const result = await userCollection.updateOne({ 'id': userId }, {
       $set: {
-        refreshToken: ''
+        refreshToken,
       }
     })
 

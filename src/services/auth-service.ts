@@ -45,7 +45,6 @@ export const authService: ServiceAuthType = {
     } catch (error) {
       // Если письмо не отправилось, то удаляем добавленного пользователя
       await userRepository.deleteUserById(newUser.id)
-      console.log('error', error)
       // Возвращаем null
       return null
     }
@@ -75,7 +74,7 @@ export const authService: ServiceAuthType = {
 
     // Получаем идентификатор пользователя по refresh токену
     const userId = await jwtService.getUserIdByRefreshToken(token)
-    console.log('userId', userId)
+
     // Если идентификатор пользователя не найден, останавливаем выполнение
     if (!userId) {
       return null
@@ -97,12 +96,12 @@ export const authService: ServiceAuthType = {
     return userId
   },
   // Удаление refresh токен
-  async deleteRefreshTokenByUserId(userId) {
+  async updateRefreshTokenByUserId(userId, refreshToken) {
     // Удаляем refresh токен
-    const isDeletedRefreshToken = await userRepository.deleteRefreshTokenByUserId(userId)
+    const isUpdatedRefreshToken = await userRepository.updateRefreshTokenByUserId(userId, refreshToken)
 
-    // Возвращаем удален(true) / не удален(false)
-    return isDeletedRefreshToken
+    // Возвращаем обновлен(true) / не обновлен(false)
+    return isUpdatedRefreshToken
   },
   // Подтверждение email по коду
   async confirmEmail(code) {
