@@ -1,5 +1,4 @@
 import { Router, Response, Request } from 'express'
-import { jwtService } from '../application'
 import { userService, authService } from '../services'
 import {
   authBearerMiddleware,
@@ -72,8 +71,6 @@ authRouter
 
     // Формируем access и refresh токены
     const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id)
-    console.log('accessToken', accessToken)
-    console.log('refreshToken', refreshToken)
 
     // Обновляем refresh токен у пользователя
     await authService.updateRefreshTokenByUserId(user.id, refreshToken)
@@ -85,8 +82,6 @@ authRouter
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/refresh-token', async (req: Request, res: Response) => {
-    // res.cookie('refreshToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxNjczMjEyNjI4OTQxIiwiaWF0IjoxNjczNDY5NTkxLCJleHAiOjE2NzM1NDE1OTF9.f-idajYl2IEDOBYJGlRp4Eqsp79XQjWLCnhROP5XGeg');
-
     if (!req.cookies.refreshToken) {
       return res.status(401).send()
     }
