@@ -81,7 +81,7 @@ authRouter
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/refresh-token', async (req: Request, res: Response) => {
-    if (!req?.cookies?.refreshToken) {
+    if (!req.cookies.refreshToken) {
       return res.status(401).send()
     }
 
@@ -103,8 +103,8 @@ authRouter
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/logout', async (req: Request, res: Response) => {
-    if (!req?.cookies?.refreshToken) {
-      return res.status(401).send(`req.cookies = ${req?.cookies}, req.headers = ${JSON.stringify(req.headers)}`)
+    if (!req.cookies.refreshToken) {
+      return res.status(401).send()
     }
 
     // Верифицируем refresh токен и получаем идентификатор пользователя
