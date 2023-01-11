@@ -127,7 +127,6 @@ export const authService: ServiceAuthType = {
       // Возвращаем результат обнорвления кода подтверждения email
       return isUpdatedConfirmationCode
     } catch (error) {
-      console.log('error', error)
       // Возвращаем false
       return false
     }

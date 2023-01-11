@@ -53,8 +53,6 @@ export const userRepository: RepositoryUserType = {
       return null
     }
 
-    console.log('findUserById foundUser', foundUser)
-
     return this._getUserAuthViewModel(foundUser)
   },
   async findRefreshTokenByUserId(userId) {
