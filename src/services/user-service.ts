@@ -46,6 +46,7 @@ export const userService: ServiceUserType = {
         expirationDate: new Date(),
         isConfirmed: true,
       },
+      refreshToken: '',
     }
 
     const createdUser = await userRepository.createdUser(newUser)

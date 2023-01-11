@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt'
 import { add } from 'date-fns'
 import { userService } from './user-service'
 import { userRepository } from '../repositories/user/user-db-repository'
+import { jwtService } from '../application'
 import { emailManager } from '../managers'
 import { getNextStrId, generateConfirmationCode } from '../utils'
 import { UserType, ServiceAuthType } from '../types'
@@ -30,6 +31,7 @@ export const authService: ServiceAuthType = {
         expirationDate: add(new Date(), { hours: 1, minutes: 30 }),
         isConfirmed: false,
       },
+      refreshToken: '',
     }
 
     // Создаем пользователя
@@ -63,6 +65,44 @@ export const authService: ServiceAuthType = {
     }
 
     return user
+  },
+  // Верификация refresh токен
+  async checkRefreshToken(token) {
+    // Если refresh токен не передан, останавливаем выполнение
+    if (!token) {
+      return null
+    }
+
+    // Получаем идентификатор пользователя по refresh токену
+    const userId = await jwtService.getUserIdByRefreshToken(token)
+    
+    // Если идентификатор пользователя не найден, останавливаем выполнение
+    if (!userId) {
+      return null
+    }
+
+    // Получаем refresh токен пользователя
+    const foundRefreshToken = await userRepository.findRefreshTokenByUserId(userId)
+
+    // Если refresh токен по идентификатору пользователя не найден, останавливаем выполнение
+    if (!foundRefreshToken) {
+      return null
+    }
+
+    // Если переданный refresh токен не равен refresh токену пользователя, останавливаем выполнение
+    if (foundRefreshToken.refreshToken !== token) {
+      return null
+    }
+
+    return userId
+  },
+  // Удаление refresh токен
+  async deleteRefreshTokenByUserId(userId) {
+    // Удаляем refresh токен
+    const isDeletedRefreshToken = await userRepository.deleteRefreshTokenByUserId(userId)
+
+    // Возвращаем удален(true) / не удален(false)
+    return isDeletedRefreshToken
   },
   // Подтверждение email по коду
   async confirmEmail(code) {
@@ -123,7 +163,14 @@ export const authService: ServiceAuthType = {
 
     return user
   },
+  async createUserAuthTokens(userId) {
+    // Формируем access токен
+    const accessToken = await jwtService.createAccessToken(userId)
+    // Формируем refresh токен
+    const refreshToken = await jwtService.createRefreshToken(userId)
 
+    return { accessToken, refreshToken }
+  },
   // Формируем hash из пароля и его соли
   async _generateHash(password, salt) {
     const hash = await bcrypt.hash(password, salt)

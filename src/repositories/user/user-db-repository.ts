@@ -55,6 +55,15 @@ export const userRepository: RepositoryUserType = {
 
     return this._getUserAuthViewModel(foundUser)
   },
+  async findRefreshTokenByUserId(userId) {
+    const foundUser: UserType | null = await userCollection.findOne({ 'id': userId })
+
+    if (!foundUser) {
+      return null
+    }
+
+    return { refreshToken: foundUser.refreshToken }
+  },
   async findByLoginOrEmail(loginOrEmail: string) {
     const foundUser: UserType | null = await userCollection.findOne({ $or: [{ 'accountData.login': loginOrEmail }, { 'accountData.email': loginOrEmail }] })
 
@@ -96,6 +105,15 @@ export const userRepository: RepositoryUserType = {
     const result = await userCollection.updateOne({ 'accountData.email': email }, {
       $set: {
         'emailConfirmation.confirmationCode': code
+      }
+    })
+
+    return result.modifiedCount === 1
+  },
+  async deleteRefreshTokenByUserId(userId) {
+    const result = await userCollection.updateOne({ 'id': userId }, {
+      $set: {
+        refreshToken: ''
       }
     })
 

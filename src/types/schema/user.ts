@@ -31,4 +31,5 @@ export type UserType = {
   id: string
   accountData: UserDataType
   emailConfirmation: EmailConfirmationType
+  refreshToken: string
 }

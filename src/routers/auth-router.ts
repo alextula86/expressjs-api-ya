@@ -70,77 +70,46 @@ authRouter
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
-    // Формируем access токен
-    const accessToken = await jwtService.createAccessToken(user.id)
-    // Формируем refresh токен
-    const refreshToken = await jwtService.createRefreshToken(user.id)
+    // Формируем access и refresh токены
+    const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id)
 
     // Пишем refresh токен в cookie
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 
     // Возвращаем статус 200 и сформированный access токен
-    res.status(HTTPStatuses.SUCCESS200).send(accessToken)
+    res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/refresh-token', async (req: Request, res: Response) => {
-    const token = req.cookies.refreshToken
-
-    // Если refreshToken не передан, возвращаем статус 401
-    if (!token) {
-      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
-    }
-
-    // Получаем идентификатор пользователя из refreshToken
-    const userId = await jwtService.getUserIdByRefreshToken(token)
+    // Верифицируем refresh токен и получаем идентификатор пользователь
+    const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
 
     // Если идентификатор пользователя не определен, возвращаем статус 401
     if (!userId) {
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
-    // Получаем пользователя по его идентификатору
-    const user = await userService.findUserById(userId)
-
-    // Если пользователь не найден, возвращаем статус 401
-    if (!user) {
-      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
-    }
-
-    // Формируем новый access токен
-    const accessToken = await jwtService.createAccessToken(user.userId)
-    // Формируем новый refresh токен
-    const refreshToken = await jwtService.createRefreshToken(user.userId)
+    // Формируем access и refresh токены
+    const { accessToken, refreshToken } = await authService.createUserAuthTokens(userId)
 
     // Пишем новый refresh токен в cookie
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 
     // Возвращаем статус 200 и сформированный новый access токен
-    res.status(HTTPStatuses.SUCCESS200).send(accessToken)
+    res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/logout', async (req: Request, res: Response) => {
-    const token = req.cookies.refreshToken
-
-    // Если refreshToken не передан, возвращаем статус 401
-    if (!token) {
-      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
-    }
-
-    // Получаем идентификатор пользователя из refreshToken
-    const userId = await jwtService.getUserIdByRefreshToken(token)
+    // Верифицируем refresh токен и получаем идентификатор пользователь
+    const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
 
     // Если идентификатор пользователя не определен, возвращаем статус 401
     if (!userId) {
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
-    // Получаем пользователя по его идентификатору
-    const user = await userService.findUserById(userId)
-
-    // Если пользователь не найден, возвращаем статус 401
-    if (!user) {
-      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
-    }
-
     // Удаляем refresh токен
+    await authService.deleteRefreshTokenByUserId(userId)
+
+    // Удаляем refresh токен из cookie
     res.clearCookie('refreshToken')
 
     // Возвращаем статус 204
