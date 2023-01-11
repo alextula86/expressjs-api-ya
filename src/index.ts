@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
 import { runDb } from './repositories/db'
 import { blogsRouter } from './routers/blogs-router'
 import { postsRouter } from './routers/posts-router'
@@ -12,8 +13,10 @@ export const app = express()
 const port = process.env.PORT || 5000
 
 const jsonBodyMiddleware = bodyParser.json()
+const jsonCookieMiddleware = cookieParser()
 
 app.use(jsonBodyMiddleware)
+app.use(jsonCookieMiddleware)
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/posts', postsRouter)
