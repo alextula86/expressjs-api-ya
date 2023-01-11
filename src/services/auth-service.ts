@@ -75,7 +75,7 @@ export const authService: ServiceAuthType = {
 
     // Получаем идентификатор пользователя по refresh токену
     const userId = await jwtService.getUserIdByRefreshToken(token)
-    
+    console.log('userId', userId)
     // Если идентификатор пользователя не найден, останавливаем выполнение
     if (!userId) {
       return null

@@ -72,7 +72,8 @@ authRouter
 
     // Формируем access и refresh токены
     const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id)
-
+    console.log('accessToken', accessToken)
+    console.log('refreshToken', refreshToken)
     // Пишем refresh токен в cookie
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
 
@@ -80,7 +81,11 @@ authRouter
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/refresh-token', async (req: Request, res: Response) => {
-    // Верифицируем refresh токен и получаем идентификатор пользователь
+    if (!req?.cookies?.refreshToken) {
+      return res.status(401).send(`req.cookies = ${req?.cookies}, req.headers = ${req.headers}`)
+    }
+
+    // Верифицируем refresh токен и получаем идентификатор пользователя
     const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
 
     // Если идентификатор пользователя не определен, возвращаем статус 401
@@ -98,7 +103,7 @@ authRouter
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
   .post('/logout', async (req: Request, res: Response) => {
-    // Верифицируем refresh токен и получаем идентификатор пользователь
+    // Верифицируем refresh токен и получаем идентификатор пользователя
     const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
 
     // Если идентификатор пользователя не определен, возвращаем статус 401
