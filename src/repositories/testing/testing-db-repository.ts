@@ -1,4 +1,11 @@
-import { blogCollection, postCollection, commentCollection, userCollection } from '../../repositories/db'
+import {
+  blogCollection,
+  postCollection,
+  commentCollection,
+  userCollection,
+  deviceCollection,
+  sessionCollection,
+} from '../../repositories/db'
 import { RepositoryTestingType } from '../../types'
 
 export const testingRepository: RepositoryTestingType = {
@@ -7,6 +14,8 @@ export const testingRepository: RepositoryTestingType = {
     await postCollection.deleteMany({})
     await commentCollection.deleteMany({})
     await userCollection.deleteMany({})
+    await deviceCollection.deleteMany({})
+    await sessionCollection.deleteMany({})
 
     return true
   },
