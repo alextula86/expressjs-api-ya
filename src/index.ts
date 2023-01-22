@@ -7,10 +7,13 @@ import { postsRouter } from './routers/posts-router'
 import { commentsRouter } from './routers/comments-router'
 import { usersRouter } from './routers/users-router'
 import { authRouter } from './routers/auth-router'
+import { securityRouter } from './routers/security-router'
 import { testingRouter } from './routers/testing-router'
 
 export const app = express()
 const port = process.env.PORT || 5000
+
+app.set('trust proxy', true)
 
 const jsonBodyMiddleware = bodyParser.json()
 const jsonCookieMiddleware = cookieParser()
@@ -23,6 +26,7 @@ app.use('/api/posts', postsRouter)
 app.use('/api/comments', commentsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/auth', authRouter)
+app.use('/api/security', securityRouter)
 app.use('/api/testing', testingRouter)
 
 const startApp = async () => {

@@ -1,5 +1,6 @@
 export * from './auth-basic-middleware'
 export * from './auth-bearer-middleware'
+export * from './auth-refresh-token-middleware'
 export * from './blog-input-validation-middleware'
 export * from './post-input-validation-middleware'
 export * from './comment-input-validation-middleware'

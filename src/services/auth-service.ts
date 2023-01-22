@@ -5,7 +5,7 @@ import { userService } from './user-service'
 import { userRepository } from '../repositories/user/user-db-repository'
 import { jwtService } from '../application'
 import { emailManager } from '../managers'
-import { getNextStrId, generateConfirmationCode } from '../utils'
+import { getNextStrId, generateUUID } from '../utils'
 import { UserType, ServiceAuthType } from '../types'
 
 export const authService: ServiceAuthType = {
@@ -16,7 +16,7 @@ export const authService: ServiceAuthType = {
     // Формируем хэш пароля
     const passwordHash = await userService._generateHash(password, passwordSalt)
     // Генерируем код для подтверждения email
-    const confirmationCode = generateConfirmationCode()
+    const confirmationCode = generateUUID()
     // Формируем пользователя
     const newUser: UserType = {
       id: getNextStrId(),
@@ -72,16 +72,16 @@ export const authService: ServiceAuthType = {
       return null
     }
 
-    // Получаем идентификатор пользователя по refresh токену
-    const userId = await jwtService.getUserIdByRefreshToken(token)
+    // Получаем идентификатор пользователя и устройства по refresh токену
+    const refreshTokenData = await jwtService.getRefreshTokenData(token)
 
-    // Если идентификатор пользователя не найден, останавливаем выполнение
-    if (!userId) {
+    // Если идентификатор пользователя и устройства не найдены, останавливаем выполнение
+    if (!refreshTokenData) {
       return null
     }
 
     // Получаем refresh токен пользователя
-    const foundRefreshToken = await userRepository.findRefreshTokenByUserId(userId)
+    const foundRefreshToken = await userRepository.findRefreshTokenByUserId(refreshTokenData.userId)
 
     // Если refresh токен по идентификатору пользователя не найден, останавливаем выполнение
     if (!foundRefreshToken) {
@@ -93,7 +93,7 @@ export const authService: ServiceAuthType = {
       return null
     }
 
-    return userId
+    return refreshTokenData
   },
   // Удаление refresh токен
   async updateRefreshTokenByUserId(userId, refreshToken) {
@@ -114,7 +114,7 @@ export const authService: ServiceAuthType = {
   // Повторная отправка кода подтверждения email
   async resendingCode(email) {
     // Генерируем код для подтверждения email
-    const confirmationCode = generateConfirmationCode()
+    const confirmationCode = generateUUID()
 
     // Обновляем код подтвержения
     const isUpdatedConfirmationCode = await userRepository.updateConfirmationCodeByEmail(email, confirmationCode)
@@ -161,11 +161,11 @@ export const authService: ServiceAuthType = {
 
     return user
   },
-  async createUserAuthTokens(userId) {
+  async createUserAuthTokens(userId, deviceid) {
     // Формируем access токен
     const accessToken = await jwtService.createAccessToken(userId)
     // Формируем refresh токен
-    const refreshToken = await jwtService.createRefreshToken(userId)
+    const refreshToken = await jwtService.createRefreshToken(userId, deviceid)
 
     return { accessToken, refreshToken }
   },

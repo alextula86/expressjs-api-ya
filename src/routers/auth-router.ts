@@ -1,7 +1,8 @@
 import { Router, Response, Request } from 'express'
-import { userService, authService } from '../services'
+import { userService, authService, deviceService } from '../services'
 import {
   authBearerMiddleware,
+  authRefreshTokenMiddleware,
   loginOrEmailUserValidation,
   passwordUserValidation,
   loginUserValidation,
@@ -24,6 +25,8 @@ import {
   HTTPStatuses,
   ErrorsMessageType,
 } from '../types'
+
+import { generateUUID } from '../utils'
 
 export const authRouter = Router()
 
@@ -69,8 +72,14 @@ authRouter
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
+    const createdDevice = await deviceService.createdDevice({
+      ip: req.ip,
+      title: req.headers['user-agent'] || '',
+      userId: user.id,
+    })
+
     // Формируем access и refresh токены
-    const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id)
+    const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id, createdDevice.id)
 
     // Обновляем refresh токен у пользователя
     await authService.updateRefreshTokenByUserId(user.id, refreshToken)
@@ -81,24 +90,12 @@ authRouter
     // Возвращаем статус 200 и сформированный access токен
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
-  .post('/refresh-token', async (req: Request, res: Response) => {
-    if (!req.cookies.refreshToken) {
-      return res.status(401).send()
-    }
-
-    // Верифицируем refresh токен и получаем идентификатор пользователя
-    const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
-
-    // Если идентификатор пользователя не определен, возвращаем статус 401
-    if (!userId) {
-      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
-    }
-
+  .post('/refresh-token', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
     // Формируем access и refresh токены
-    const { accessToken, refreshToken } = await authService.createUserAuthTokens(userId)
+    const { accessToken, refreshToken } = await authService.createUserAuthTokens(req.user.userId, req.device.deviceId)
 
     // Обновляем refresh токен у пользователя
-    await authService.updateRefreshTokenByUserId(userId, refreshToken)
+    await authService.updateRefreshTokenByUserId(req.user.userId, refreshToken)
 
     // Пишем новый refresh токен в cookie
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
@@ -106,21 +103,9 @@ authRouter
     // Возвращаем статус 200 и сформированный новый access токен
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
-  .post('/logout', async (req: Request, res: Response) => {
-    if (!req.cookies.refreshToken) {
-      return res.status(401).send()
-    }
-
-    // Верифицируем refresh токен и получаем идентификатор пользователя
-    const userId = await authService.checkRefreshToken(req.cookies.refreshToken)
-
-    // Если идентификатор пользователя не определен, возвращаем статус 401
-    if (!userId) {
-      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
-    }
-
+  .post('/logout', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
     // Удаляем refresh токен
-    await authService.updateRefreshTokenByUserId(userId, '')
+    await authService.updateRefreshTokenByUserId(req.user.userId, '')
 
     // Удаляем refresh токен из cookie
     res.clearCookie('refreshToken')
