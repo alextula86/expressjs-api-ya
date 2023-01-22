@@ -49,12 +49,19 @@ const middlewaresRegistration = [
   existsUserByLoginOrEmail,
 ]
 
+const middlewaresRefreshToken = [
+  сountRequestsMiddleware,
+  authRefreshTokenMiddleware,
+]
+
 const middlewaresRegistrationConfirmation = [
+  сountRequestsMiddleware,
   codeUserValidation,
   existsUserByConfirmationCode,
 ]
 
 const middlewaresRegistrationEmailResending = [
+  сountRequestsMiddleware,
   emailUserValidation,
   existsUserByEmail,
 ]
@@ -105,7 +112,7 @@ authRouter
     // Возвращаем статус 200 и сформированный access токен
     res.status(HTTPStatuses.SUCCESS200).send({ accessToken })
   })
-  .post('/refresh-token', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
+  .post('/refresh-token', middlewaresRefreshToken, async (req: Request & any, res: Response) => {
     // Формируем access и refresh токены
     const { accessToken, refreshToken } = await authService.createUserAuthTokens(req.user.userId, req.device.id)
 
