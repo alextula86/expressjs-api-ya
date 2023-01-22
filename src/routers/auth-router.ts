@@ -34,19 +34,19 @@ import { getNextStrId } from '../utils'
 export const authRouter = Router()
 
 const middlewaresLogin = [
+  сountRequestsMiddleware,
   loginOrEmailUserValidation,
   passwordUserValidation,
   inputValidationMiddleware,
-  сountRequestsMiddleware,
 ]
 
 const middlewaresRegistration = [
+  сountRequestsMiddleware,
   loginUserValidation,
   emailUserValidation,
   passwordUserValidation,
   inputValidationMiddleware,
   existsUserByLoginOrEmail,
-  сountRequestsMiddleware,
 ]
 
 const middlewaresRegistrationConfirmation = [
