@@ -1,7 +1,7 @@
 import { Router, Response, Request } from 'express'
 import { isEmpty } from 'lodash'
 import { deviceService } from '../services'
-import { authRefreshTokenMiddleware } from '../middlewares'
+import { authRefreshTokenMiddleware, сountRequestsMiddleware } from '../middlewares'
 import {
   RequestWithParams,
   URIParamsDeviceModel,
@@ -12,7 +12,7 @@ export const securityRouter = Router()
 
 securityRouter
   // Возвращает все устройства с активными сеансами для текущего пользователя
-  .get('/devices', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
+  .get('/devices', authRefreshTokenMiddleware, сountRequestsMiddleware, async (req: Request & any, res: Response) => {
     const allDevices = await deviceService.findAllDevices(req.user.userId)  
     // console.log('req.url', req.url)
     // console.log('req.ip', req.ip)

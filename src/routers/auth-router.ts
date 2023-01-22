@@ -12,6 +12,7 @@ import {
   existsUserByLoginOrEmail,
   existsUserByEmail,
   existsUserByConfirmationCode,
+  сountRequestsMiddleware,
 } from '../middlewares'
 
 import {
@@ -44,6 +45,7 @@ const middlewaresRegistration = [
   passwordUserValidation,
   inputValidationMiddleware,
   existsUserByLoginOrEmail,
+  сountRequestsMiddleware,
 ]
 
 const middlewaresRegistrationConfirmation = [

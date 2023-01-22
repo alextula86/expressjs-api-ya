@@ -22,9 +22,14 @@ export const sessionService: ServiceSessionType = {
 
     return createdSession
   },
-  async updateAttemptSession(id) {
-    const isUpdatedAttemptSession = await sessionRepository.updateAttemptSession(id)
+  async increaseAttempt(id) {
+    const isIncreaseAttempt = await sessionRepository.increaseAttempt(id)
 
-    return isUpdatedAttemptSession
+    return isIncreaseAttempt
   },
+  async resetAttempt(id) {
+    const isResetAttempt = await sessionRepository.resetAttempt(id)
+
+    return isResetAttempt
+  },  
 }

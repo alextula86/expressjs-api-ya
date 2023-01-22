@@ -18,12 +18,20 @@ export const sessionRepository: RepositorySessionType = {
 
     return createdSession
   },
-  async updateAttemptSession(id) {
+  async increaseAttempt(id) {
+    const document = await sessionCollection.findOneAndUpdate({ id }, { $inc: { attempt: 1 } }, { returnDocument: "after", })
+
+    if (!document) {
+      return null
+    }
+
+    return document.value   
+  },   
+  async resetAttempt(id) {
     const { matchedCount } = await sessionCollection.updateOne({ id }, {
-      $inc: { attempt: 1 },
-      $set: { issuedAtt: new Date().toISOString() }
+      $set: { attempt: 1, issuedAtt: new Date().toISOString() },
     })
 
     return matchedCount === 1   
-  },
+  }, 
 }
