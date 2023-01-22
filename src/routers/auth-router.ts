@@ -37,6 +37,7 @@ const middlewaresLogin = [
   loginOrEmailUserValidation,
   passwordUserValidation,
   inputValidationMiddleware,
+  сountRequestsMiddleware,
 ]
 
 const middlewaresRegistration = [
