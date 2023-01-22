@@ -13,13 +13,13 @@ export const deviceService: ServiceDeviceType = {
 
     return foundDeviceById
   },  
-  async createdDevice({ ip, title, userId }) {
+  async createdDevice({ id, ip, title, lastActiveDate, userId }) {
     const newDevice: DeviceType = {
-      id: getNextStrId(),
+      id,
       ip,
       title,
       userId,
-      lastActiveDate: new Date().toISOString(),
+      lastActiveDate,
       active: true,
     }
 
@@ -36,5 +36,10 @@ export const deviceService: ServiceDeviceType = {
     const isDeletedDeviceById = await deviceRepository.deleteDeviceById(id)
 
     return isDeletedDeviceById
+  },
+  async updateLastActiveDateDevice(deviceId, lastActiveDate) {
+    const isUpdatedDevice = await deviceRepository.updateLastActiveDateDevice(deviceId, lastActiveDate)
+
+    return isUpdatedDevice
   },
 }

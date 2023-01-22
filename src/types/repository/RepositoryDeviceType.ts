@@ -7,6 +7,7 @@ export type RepositoryDeviceType = {
   createdDevice: (createdDevice: DeviceType) => Promise<DeviceType>
   deleteAllDevices: (userId: string) => Promise<boolean>
   deleteDeviceById: (id: string) => Promise<boolean>
+  updateLastActiveDateDevice: (deviceId: string, lastActiveDate: string) => Promise<boolean>
   _getDeviceViewModel: (dbDevice: DeviceType) => DeviceViewModel
   _getDevicesViewModel: (dbDevices: DeviceType[]) => DeviceViewModel[]
 }

@@ -13,14 +13,12 @@ export const authRefreshTokenMiddleware = async (req: Request & any, res: Respon
   const refreshTokenData = await authService.checkRefreshToken(req.cookies.refreshToken)
 
   // Если идентификатор пользователя не определен, возвращаем статус 401
-  if (!refreshTokenData) {
+  if (!refreshTokenData || !refreshTokenData.userId || !refreshTokenData.deviceId) {
     return res.status(HTTPStatuses.UNAUTHORIZED401).send()
   }
 
-  const { userId, deviceId } = refreshTokenData
-
-  req.user = await userService.findUserById(userId) 
-  req.device = await deviceService.findDeviceById(deviceId) 
+  req.user = await userService.findUserById(refreshTokenData.userId) 
+  req.device = await deviceService.findDeviceById(refreshTokenData.deviceId) 
 
   next()
 }

@@ -31,6 +31,13 @@ export const deviceRepository: RepositoryDeviceType = {
 
     return deletedCount === 1
   },
+  async updateLastActiveDateDevice(deviceId, lastActiveDate) {
+    const result = await deviceCollection.updateOne({ id: deviceId }, {
+      $set: { lastActiveDate }
+    })
+
+    return result.modifiedCount === 1
+  },
   _getDeviceViewModel(dbDevice) {
     return {
       ip: dbDevice.ip,

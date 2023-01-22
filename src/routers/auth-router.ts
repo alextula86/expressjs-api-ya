@@ -26,7 +26,9 @@ import {
   ErrorsMessageType,
 } from '../types'
 
-import { generateUUID } from '../utils'
+import { jwtService } from '../application'
+
+import { getNextStrId } from '../utils'
 
 export const authRouter = Router()
 
@@ -72,14 +74,24 @@ authRouter
       return res.status(HTTPStatuses.UNAUTHORIZED401).send()
     }
 
-    const createdDevice = await deviceService.createdDevice({
-      ip: req.ip,
-      title: req.headers['user-agent'] || '',
-      userId: user.id,
-    })
+    const deviceId = getNextStrId()
 
     // Формируем access и refresh токены
-    const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id, createdDevice.id)
+    const { accessToken, refreshToken } = await authService.createUserAuthTokens(user.id, deviceId)
+
+    const refreshTokenData = await jwtService.getRefreshTokenData(refreshToken)
+
+    if (!refreshTokenData) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    await deviceService.createdDevice({
+      id: deviceId,
+      ip: req.ip,
+      title: req.headers['user-agent'] || '',
+      lastActiveDate: new Date(refreshTokenData.expRefreshToken).toISOString(),
+      userId: user.id,
+    })
 
     // Обновляем refresh токен у пользователя
     await authService.updateRefreshTokenByUserId(user.id, refreshToken)
@@ -92,10 +104,19 @@ authRouter
   })
   .post('/refresh-token', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
     // Формируем access и refresh токены
-    const { accessToken, refreshToken } = await authService.createUserAuthTokens(req.user.userId, req.device.deviceId)
+    const { accessToken, refreshToken } = await authService.createUserAuthTokens(req.user.userId, req.device.id)
 
     // Обновляем refresh токен у пользователя
     await authService.updateRefreshTokenByUserId(req.user.userId, refreshToken)
+
+    const refreshTokenData = await jwtService.getRefreshTokenData(refreshToken)
+
+    if (!refreshTokenData) {
+      return res.status(HTTPStatuses.UNAUTHORIZED401).send()
+    }
+
+    // Обновляем дату у устройства
+    await deviceService.updateLastActiveDateDevice(req.device.id, new Date(refreshTokenData.expRefreshToken).toISOString())
 
     // Пишем новый refresh токен в cookie
     res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true })
@@ -106,6 +127,7 @@ authRouter
   .post('/logout', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
     // Удаляем refresh токен
     await authService.updateRefreshTokenByUserId(req.user.userId, '')
+    await deviceService.deleteDeviceById(req.device.deviceId)
 
     // Удаляем refresh токен из cookie
     res.clearCookie('refreshToken')
