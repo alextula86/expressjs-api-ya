@@ -32,7 +32,7 @@ export const сountRequestsMiddleware = async (req: Request & any, res: Response
     return res.status(HTTPStatuses.SERVERERROR500).send()
   }
 
-  if (response.attempt === maxAttemps) {
+  if (response.attempt > maxAttemps) {
     return res.status(HTTPStatuses.MANYREQUESTS429).send()
   }
 
