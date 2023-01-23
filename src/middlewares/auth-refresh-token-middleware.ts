@@ -12,7 +12,7 @@ export const authRefreshTokenMiddleware = async (req: Request & any, res: Respon
   // Верифицируем refresh токен и получаем идентификатор пользователя
   const refreshTokenData = await authService.checkRefreshToken(req.cookies.refreshToken)
 
-  res.send('refreshTokenData ' + JSON.stringify(refreshTokenData))
+  res.send('refreshTokenData1 ' + JSON.stringify(refreshTokenData))
 
   // Если идентификатор пользователя не определен, возвращаем статус 401
   if (!refreshTokenData) {
