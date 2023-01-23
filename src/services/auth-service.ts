@@ -66,10 +66,10 @@ export const authService: ServiceAuthType = {
     return user
   },
   // Верификация refresh токен
-  async checkRefreshToken(token) {
+  async checkRefreshToken(token, res) {
     // Если refresh токен не передан, останавливаем выполнение
-    console.log('token', token)
-    
+    console.log('checkRefreshToken token', token)
+    res.send('checkRefreshToken token ' + token)
     if (!token) {
       return null
     }

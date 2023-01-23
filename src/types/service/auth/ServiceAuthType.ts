@@ -7,7 +7,9 @@ export type ServiceAuthType = {
   confirmEmail: (code: string) => Promise<boolean>
   resendingCode: (email: string) => Promise<boolean>
   checkCredentials: (loginOrEmail: string, password: string) => Promise<UserType | null>
-  checkRefreshToken: (refreshToken: string) => Promise<{ userId: string, deviceId: string } | null>
+
+  checkRefreshToken: (refreshToken: string, res: any) => Promise<{ userId: string, deviceId: string } | null>
+  
   checkExistsUserByLoginOrEmail: (loginOrEmail: string) => Promise<UserType | null>
   checkExistsUserByEmail: (email: string) => Promise<UserType | null>
   checkExistsConfirmationCode: (confirmationCode: string) => Promise<UserType | null>
