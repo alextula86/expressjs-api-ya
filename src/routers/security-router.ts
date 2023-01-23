@@ -29,6 +29,10 @@ securityRouter
   })
   // Terminate specified device session
   .delete('/devices/:deviceId', authRefreshTokenMiddleware, async (req: RequestWithParams<URIParamsDeviceModel> & any, res: Response<boolean | string>) => {
+    if (!req.params.deviceId) {
+      return res.status(HTTPStatuses.NOTFOUND404).send()
+    }
+    
     const deviceById = await deviceService.findDeviceById(req.params.deviceId)
     
     if (!isEmpty(deviceById) && deviceById.userId !== req.user!.userId) {
