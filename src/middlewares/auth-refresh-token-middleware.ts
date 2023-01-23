@@ -5,6 +5,8 @@ import { userService, authService, deviceService } from '../services'
 import { HTTPStatuses } from '../types'
 
 export const authRefreshTokenMiddleware = async (req: Request & any, res: Response, next: NextFunction) => {
+  res.send('req.cookies.refreshToken ' + req.cookies.refreshToken)
+  
   if (!req.cookies.refreshToken) {
     return res.status(HTTPStatuses.UNAUTHORIZED401).send()
   }
