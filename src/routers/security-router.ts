@@ -14,8 +14,7 @@ securityRouter
   // Возвращает все устройства с активными сеансами для текущего пользователя
   .get('/devices', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
     const allDevices = await deviceService.findAllDevices(req.user.userId)  
-    // console.log('req.url', req.url)
-    // console.log('req.ip', req.ip)
+
     res.status(HTTPStatuses.SUCCESS200).send(allDevices)
   })
   // Завершите все другие (исключая текущие) сеансы устройства
