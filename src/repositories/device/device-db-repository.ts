@@ -44,10 +44,6 @@ export const deviceRepository: RepositoryDeviceType = {
       title: dbDevice.title,
       lastActiveDate: dbDevice.lastActiveDate,
       deviceId: dbDevice.id,
-
-      // удалить
-      userId: dbDevice.userId,
-      active: dbDevice.active,
     }
   },  
   _getDevicesViewModel(dbDevices) {
@@ -56,10 +52,6 @@ export const deviceRepository: RepositoryDeviceType = {
       title: item.title,
       lastActiveDate: item.lastActiveDate,
       deviceId: item.id,
-
-      // удалить
-      userId: item.userId,
-      active: item.active,
     }))
   },
 }

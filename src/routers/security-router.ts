@@ -1,7 +1,7 @@
 import { Router, Response, Request } from 'express'
 import { isEmpty } from 'lodash'
 import { deviceService } from '../services'
-import { authRefreshTokenMiddleware, сountRequestsMiddleware } from '../middlewares'
+import { authRefreshTokenMiddleware } from '../middlewares'
 import {
   RequestWithParams,
   URIParamsDeviceModel,
