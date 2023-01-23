@@ -68,14 +68,15 @@ export const authService: ServiceAuthType = {
   // Верификация refresh токен
   async checkRefreshToken(token, res) {
     // Если refresh токен не передан, останавливаем выполнение
-    console.log('checkRefreshToken token', token)
-    res.send('checkRefreshToken token ' + token)
     if (!token) {
       return null
     }
 
     // Получаем идентификатор пользователя и устройства по refresh токену
     const refreshTokenData = await jwtService.getRefreshTokenData(token)
+
+    console.log('checkRefreshToken refreshTokenData', JSON.stringify(refreshTokenData))
+    res.send('checkRefreshToken refreshTokenData ' + JSON.stringify(refreshTokenData))
 
     // Если идентификатор пользователя и устройства не найдены, останавливаем выполнение
     if (!refreshTokenData) {
