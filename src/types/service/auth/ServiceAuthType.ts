@@ -8,7 +8,8 @@ export type ServiceAuthType = {
   resendingCode: (email: string) => Promise<boolean>
   checkCredentials: (loginOrEmail: string, password: string) => Promise<UserType | null>
 
-  checkRefreshToken: (refreshToken: string, res: any) => Promise<{ userId: string, deviceId: string } | null>
+  checkRefreshToken: (refreshToken: string) => Promise<{ userId: string, deviceId: string } | null>
+  checkAuthRefreshToken: (refreshToken: string) => Promise<{ userId: string, deviceId: string, expRefreshToken: number } | null>
   
   checkExistsUserByLoginOrEmail: (loginOrEmail: string) => Promise<UserType | null>
   checkExistsUserByEmail: (email: string) => Promise<UserType | null>
