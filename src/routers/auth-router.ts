@@ -137,7 +137,7 @@ authRouter
   .post('/logout', authRefreshTokenMiddleware, async (req: Request & any, res: Response) => {
     // Удаляем refresh токен
     await authService.updateRefreshTokenByUserId(req.user.userId, '')
-    await deviceService.deleteDeviceById(req.device.deviceId)
+    await deviceService.deleteDeviceById(req.device.id)
 
     // Удаляем refresh токен из cookie
     res.clearCookie('refreshToken')
