@@ -6,7 +6,7 @@ export type ServiceDeviceType = {
   findAllDevices: (userId: string) => Promise<DeviceViewModel[]>
   findDeviceById: (id: string) => Promise<DeviceType | null>
   createdDevice: ({ id, ip, title, lastActiveDate, userId }: CreaetDeviceService) => Promise<DeviceType>
-  deleteAllDevices: (userId: string) => Promise<boolean>
+  deleteAllDevices: (userId: string, currentDeviceId: string) => Promise<boolean>
   deleteDeviceById: (id: string) => Promise<boolean>
   updateLastActiveDateDevice: (deviceId: string, lastActiveDate: string) => Promise<boolean>
 }

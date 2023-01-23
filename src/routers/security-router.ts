@@ -19,7 +19,7 @@ securityRouter
   })
   // Завершите все другие (исключая текущие) сеансы устройства
   .delete('/devices', authRefreshTokenMiddleware, async (req: Request & any, res: Response<boolean | string>) => {
-    const isDeleteAllDevices = await deviceService.deleteAllDevices(req.user.userId)
+    const isDeleteAllDevices = await deviceService.deleteAllDevices(req.user.userId, req.device.id)
 
     if (!isDeleteAllDevices) {
       return res.status(HTTPStatuses.NOTFOUND404).send()

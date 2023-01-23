@@ -27,8 +27,8 @@ export const deviceService: ServiceDeviceType = {
 
     return createdDevice
   },
-  async deleteAllDevices(userId) {
-    const isDeleteAllDevices = await deviceRepository.deleteAllDevices(userId)
+  async deleteAllDevices(userId, currentDeviceId) {
+    const isDeleteAllDevices = await deviceRepository.deleteAllDevices(userId, currentDeviceId)
 
     return isDeleteAllDevices
   },

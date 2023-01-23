@@ -21,9 +21,9 @@ export const deviceRepository: RepositoryDeviceType = {
 
     return createdDevice
   },  
-  async deleteAllDevices(userId) {
-    const { deletedCount } = await deviceCollection.deleteMany({ userId })
-   
+  async deleteAllDevices(userId, currentDeviceId) {
+    const { deletedCount } = await deviceCollection.deleteMany({ $and: [{ userId }, { id: { $ne: currentDeviceId } }] })
+
     return deletedCount > 0
   },
   async deleteDeviceById(id) {
