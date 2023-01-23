@@ -68,6 +68,8 @@ export const authService: ServiceAuthType = {
   // Верификация refresh токен
   async checkRefreshToken(token) {
     // Если refresh токен не передан, останавливаем выполнение
+    console.log('token', token)
+    
     if (!token) {
       return null
     }
