@@ -5,8 +5,6 @@ import { userService, authService, deviceService } from '../services'
 import { HTTPStatuses } from '../types'
 
 export const authRefreshTokenMiddleware = async (req: Request & any, res: Response, next: NextFunction) => {
-  res.send('req.cookies.refreshToken ' + req.cookies.refreshToken)
-  
   if (!req.cookies.refreshToken) {
     return res.status(HTTPStatuses.UNAUTHORIZED401).send()
   }
@@ -14,8 +12,10 @@ export const authRefreshTokenMiddleware = async (req: Request & any, res: Respon
   // Верифицируем refresh токен и получаем идентификатор пользователя
   const refreshTokenData = await authService.checkRefreshToken(req.cookies.refreshToken)
 
+  res.send('refreshTokenData ' + refreshTokenData)
+
   // Если идентификатор пользователя не определен, возвращаем статус 401
-  if (!refreshTokenData || !refreshTokenData.userId || !refreshTokenData.deviceId) {
+  if (!refreshTokenData) {
     return res.status(HTTPStatuses.UNAUTHORIZED401).send()
   }
 
